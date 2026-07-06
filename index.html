@@ -82,7 +82,7 @@
   #tipbox:after{content:'';position:absolute;left:var(--ax,20px);bottom:-7px;border:7px solid transparent;border-top-color:#111827;border-bottom:0}
   #tipbox.up:after{top:-7px;bottom:auto;border-top:0;border-bottom-color:#111827}
   /* 상담 플로팅 버튼 (#4) */
-  .fab{position:fixed;z-index:55;right:calc(50% - 215px + 14px);bottom:20px;background:linear-gradient(135deg,#16a34a,#15803d);color:#fff;border:none;border-radius:30px;padding:12px 16px 12px 14px;font-size:14px;font-weight:800;box-shadow:0 6px 20px rgba(22,163,74,.4);cursor:pointer;display:flex;align-items:center;gap:6px;animation:fabpulse 2.4s ease-in-out infinite}
+  .fab{position:fixed;z-index:55;right:calc(50% - 215px + 14px);bottom:110px;touch-action:none;background:linear-gradient(135deg,#16a34a,#15803d);color:#fff;border:none;border-radius:30px;padding:12px 16px 12px 14px;font-size:14px;font-weight:800;box-shadow:0 6px 20px rgba(22,163,74,.4);cursor:pointer;display:flex;align-items:center;gap:6px;animation:fabpulse 2.4s ease-in-out infinite}
   .fab .ic{font-size:18px}
   @keyframes fabpulse{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
   @media(max-width:462px){.fab{right:14px}}
@@ -125,7 +125,7 @@
   <main id="screen"></main>
   <div class="cfg" id="cfg"></div>
   <div class="menu" id="menu" onclick="if(event.target===this)toggleMenu()"></div>
-  <button class="fab" id="fab" onclick="openConsult()" title="사용이 어려우시면 편하게 문의하세요"><span class="ic">💬</span><span>도움이 필요하세요?</span></button>
+  <button class="fab" id="fab" onclick="openConsult()" title="사용이 어려우시면 편하게 문의하세요 · 버튼을 끌면 위치를 옮길 수 있어요"><span class="ic">💬</span><span>도움이 필요하세요?</span></button>
 </div>
 <div id="tipbox" onclick="hideTip()"></div>
 
@@ -272,7 +272,7 @@ function estimate(){
   return{comp,C,S,K,doorSides,saved,net,orderC,orderS,orderK,orderTotal,laid,areaCount,gridCount,midCount,unit,thr,area,matLabor,visit,cutCount,cutCost,total,vatMode,supply,vat,grand};
 }
 
-const A={step:0,danji:null,templateKey:null,extend:true,zone:'living_hall_kitchen',rooms:[],manualMode:false,manual:[{name:'거실',w:5000,h:3400,open:2}],company:0,doors:0,doorsFlush:0,pantry:0,cuts:0,dim:{},showDim:false,livingW:0,planImg:null,cust:{name:'',phone:'',addr:'',addrBase:'',addrDetail:'',addrVerified:false,zonecode:'',time:'아무 때나',memo:''},agreeReq:true,agreeMkt:false,showReq:false,showMkt:false,events:[],quickKey:null,quickScope:'all',quickFrom:false,rev:{}};
+const A={step:0,danji:null,templateKey:null,extend:true,zone:'living_hall_kitchen',rooms:[],manualMode:false,manual:[{name:'거실',w:5000,h:3400,open:2}],company:0,doors:0,doorsFlush:0,pantry:0,cuts:0,dim:{},showDim:false,livingW:0,planImg:null,cust:{name:'',phone:'',addr:'',addrBase:'',addrDetail:'',addrVerified:false,zonecode:'',time:'아무 때나',memo:''},agreeReq:true,agreeMkt:false,showReq:false,showMkt:false,events:[],quickKey:null,quickScope:'all',quickZone:'living_hall_kitchen',quickRooms:0,quickFrom:false,rev:{}};
 const STEPS=['시작','단지 찾기','평형/구조','발코니','시공 범위','문 확인','매트 선택','견적 완성'];
 const $=id=>document.getElementById(id);
 const ILL={
@@ -412,8 +412,11 @@ function render(){
     s.innerHTML='<div class="ill">'+ILL.layout+'</div><h1>딱 두 가지만!</h1><p class="lead">평형과 범위만 고르면 <b>대략 견적</b>이 바로 나와요. 정확한 값은 언제든 실측으로 맞춰요 🙂</p>'
       +'<div class="sec">평형 (우리집과 가까운 것)</div>'
       +'<select onchange="A.quickKey=this.value" style="margin-bottom:12px">'+Object.keys(TPL).map(function(k){return '<option value="'+k+'"'+(A.quickKey===k?' selected':'')+'>'+TPL[k].label+'</option>';}).join('')+'</select>'
-      +'<div class="sec">어디에 깔까요?</div>'
-      +[['all','집 전체 (거실+주방+방 전부)'],['public','거실·주방·복도만'],['rooms','방만 (안방·작은방)']].map(function(o){return '<button class="opt'+(A.quickScope===o[0]?' sel':'')+'" onclick="A.quickScope=\''+o[0]+'\';render()">'+o[1]+'</button>';}).join('')
+      +'<div class="sec">공용부는 어디까지?</div>'
+      +[['living','거실만'],['living_hall','거실 + 복도'],['living_hall_kitchen','거실 + 복도 + 주방'],['none','공용부 없음 (방만 시공)']].map(function(o){return '<button class="opt'+(A.quickZone===o[0]?' sel':'')+'" onclick="A.quickZone=\''+o[0]+'\';render()">'+o[1]+'</button>';}).join('')
+      +'<div class="sec">방은 몇 개까지?</div><div>'
+      +[[0,'없음'],[1,'방 1개'],[2,'방 2개'],[3,'방 3개']].map(function(o){return '<span class="chip'+(A.quickRooms===o[0]?' sel':'')+'" onclick="A.quickRooms='+o[0]+';render()">'+o[1]+'</span>';}).join('')+'</div>'
+      +'<p class="hint" style="margin-top:6px">조합을 바꿔가며 여러 경우의 견적을 바로 비교해보세요 🙂</p>'
       +'<div class="sec">매트 크기 · '+tip('경사 마감이란?','bevel')+'</div><div>'+MATS.map(function(c,i){return '<span class="chip'+(A.company===i?' sel':'')+'" onclick="A.company='+i+';render()">'+c.L+'</span>';}).join('')+'</div>'
       +'<p class="hint" style="margin-top:8px">금액은 '+tip('부가세 10% 포함','vat')+'으로 보여드려요. 더 정밀하게 하려면 아래 \'자세히\'로!</p>'
       +'<div class="nav"><button class="btn ghost" onclick="go(0)">처음</button><button class="btn ghost" style="flex:1" onclick="go(1)">자세히</button><button class="btn" onclick="runQuick()">견적 보기 🎉</button></div>';
@@ -560,8 +563,8 @@ function openConsult(){ hideTip(); $('menu').classList.remove('open'); go(8); }
 /* ===== 최소입력 빠른 견적 (#7) ===== */
 function runQuick(){ if(!A.quickKey)A.quickKey=Object.keys(TPL)[0];
   A.templateKey=A.quickKey; A.manualMode=false; A.extend=true; A.dim={}; A.livingW=0;
-  const map={ all:['living_hall_kitchen',['방1','방2','방3']], public:['living_hall_kitchen',[]], rooms:['none',['방1','방2','방3']] };
-  const m=map[A.quickScope]||map.all; A.zone=m[0]; A.rooms=m[1].slice();
+  if(A.quickZone==='none'&&!(A.quickRooms>0)){ alert('공용부나 방을 하나 이상 골라주세요 🙂'); return; }
+  A.zone=A.quickZone; A.rooms=['방1','방2','방3'].slice(0,A.quickRooms||0);
   A.doors=0; A.doorsFlush=0; A.cuts=0; A.quickFrom=true; go(7); }
 
 /* ===== 견적서 문자 발송 (#3) ===== */
@@ -620,6 +623,28 @@ async function submitReview(){ const rv=A.rev||{};
   }catch(e){ alert('서버 연결을 확인해 주세요.'); } }
 
 render();
+
+/* ---- FAB 드래그 이동 (#고객요청: 가려짐 방지) ---- */
+(function(){
+  const f=document.getElementById('fab'); if(!f) return;
+  try{ const p=JSON.parse(localStorage.getItem('fab_pos')||'null');
+    if(p&&p.x!=null){ f.style.left=Math.min(Math.max(4,p.x),window.innerWidth-80)+'px'; f.style.top=Math.min(Math.max(4,p.y),window.innerHeight-60)+'px'; f.style.right='auto'; f.style.bottom='auto'; f.style.animation='none'; } }catch(e){}
+  let drag=false,moved=false,sx=0,sy=0,ox=0,oy=0;
+  f.addEventListener('pointerdown',function(e){ drag=true; moved=false; sx=e.clientX; sy=e.clientY;
+    const r=f.getBoundingClientRect(); ox=r.left; oy=r.top; try{f.setPointerCapture(e.pointerId);}catch(_){}} );
+  f.addEventListener('pointermove',function(e){ if(!drag) return;
+    const dx=e.clientX-sx, dy=e.clientY-sy;
+    if(!moved && Math.abs(dx)+Math.abs(dy)>8){ moved=true; f.style.animation='none'; f.style.right='auto'; f.style.bottom='auto'; }
+    if(!moved) return;
+    const nx=Math.min(Math.max(4,ox+dx), window.innerWidth-f.offsetWidth-4);
+    const ny=Math.min(Math.max(4,oy+dy), window.innerHeight-f.offsetHeight-4);
+    f.style.left=nx+'px'; f.style.top=ny+'px'; });
+  function endDrag(){ if(drag&&moved){ const r=f.getBoundingClientRect();
+      try{ localStorage.setItem('fab_pos', JSON.stringify({x:r.left,y:r.top})); }catch(_){}}
+    drag=false; }
+  f.addEventListener('pointerup',endDrag); f.addEventListener('pointercancel',endDrag);
+  f.addEventListener('click',function(e){ if(moved){ e.stopImmediatePropagation(); e.preventDefault(); moved=false; } },true);
+})();
 </script>
 <script>if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("/sw.js").catch(function(){});});}</script>
 </body>
