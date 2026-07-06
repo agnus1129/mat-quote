@@ -1,0 +1,27 @@
+services:
+  - type: web
+    name: mat-quote
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: node server.js
+    healthCheckPath: /api/health
+    envVars:
+      - key: SERVICE_KEY        # 공공데이터포털 키 (필수)
+        sync: false
+      - key: ADMIN_PASS         # 관리자 비밀번호 (필수, 강하게)
+        sync: false
+      - key: BASE_URL           # 배포 후 https URL (소셜로그인 시)
+        sync: false
+      - key: KAKAO_CLIENT_ID
+        sync: false
+      - key: KAKAO_CLIENT_SECRET
+        sync: false
+      - key: NAVER_CLIENT_ID
+        sync: false
+      - key: NAVER_CLIENT_SECRET
+        sync: false
+      - key: RETENTION_LEADS    # 고객정보 보관(일), 기본 365
+        value: "365"
+      - key: RETENTION_LOGS     # 로그 보관(일), 기본 180
+        value: "180"

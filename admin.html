@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>관리자 — 고객·분석 대시보드</title>
+<style>
+  :root{--bg:#f4f6f9;--card:#fff;--ink:#1f2733;--sub:#6b7785;--line:#e2e8f0;--brand:#2563eb;--ok:#16a34a;--warn:#b45309}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:'Segoe UI','Malgun Gothic',sans-serif;background:var(--bg);color:var(--ink);font-size:14px}
+  header{background:linear-gradient(135deg,#0f172a,#1e3a8a);color:#fff;padding:16px 18px}
+  header h1{margin:0;font-size:17px}
+  header .s{font-size:12px;opacity:.85;margin-top:3px}
+  .wrap{max-width:1100px;margin:0 auto;padding:14px}
+  .tabs{display:flex;gap:8px;margin-bottom:12px}
+  .tab{padding:9px 16px;border:1px solid var(--line);background:#fff;border-radius:10px;font-weight:700;cursor:pointer}
+  .tab.on{background:var(--brand);color:#fff;border-color:var(--brand)}
+  .card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:14px}
+  .kpis{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+  .kpi{flex:1;min-width:120px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px;text-align:center}
+  .kpi b{display:block;font-size:26px;color:var(--brand)}
+  .kpi span{font-size:12px;color:var(--sub)}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th,td{border:1px solid var(--line);padding:7px 8px;text-align:left;white-space:nowrap}
+  th{background:#f1f5f9;position:sticky;top:0}
+  .scroll{overflow:auto;max-height:62vh}
+  .btn{background:var(--brand);color:#fff;border:none;padding:8px 14px;border-radius:8px;font-weight:600;cursor:pointer}
+  .btn.sec{background:#eef2f7;color:var(--ink)}
+  .bar{background:#eef2f7;border-radius:6px;height:22px;position:relative;min-width:60px}
+  .bar>i{position:absolute;left:0;top:0;bottom:0;background:var(--brand);border-radius:6px}
+  .bar.warn>i{background:var(--warn)}
+  .muted{color:var(--sub);font-size:12px}
+  .yes{color:var(--ok);font-weight:700}.no{color:#b91c1c}
+  .row{display:flex;gap:8px;align-items:center;margin-bottom:10px;flex-wrap:wrap}
+  input{padding:7px 9px;border:1px solid var(--line);border-radius:8px}
+</style>
+</head>
+<body>
+<header><h1>🔐 관리자 대시보드</h1><div class="s">고객 명단 · 동의 관리 · 접속/체류 분석 · 층간소음매트 견적</div></header>
+<div class="wrap">
+  <div class="row">
+    <label class="muted">서버</label><input id="base" value="" placeholder="비우면 현재 주소" style="flex:1;min-width:200px">
+    <button class="btn sec" onclick="loadAll()">새로고침</button><button class="btn sec" onclick="sessionStorage.removeItem('adminPass');location.reload()">잠금</button>
+    <button class="btn sec" onclick="csv()">고객명단 CSV</button>
+  </div>
+  <div class="kpis" id="kpis"></div>
+  <div class="tabs">
+    <div class="tab on" id="t1" onclick="tab(1)">고객 명단</div>
+    <div class="tab" id="t2" onclick="tab(2)">접속·체류 분석</div>
+    <div class="tab" id="t3" onclick="tab(3)">접속 로그</div>
+  </div>
+  <div class="card" id="panel"><div class="muted">불러오는 중…</div></div>
+</div>
+<script>
+const $=id=>document.getElementById(id);
+const base=()=>($('base').value||location.origin).replace(/\/+$/,'');
+const STEP=['0 시작','1 단지검색','2 평형/구조','3 발코니','4 시공범위','5 문 확인','6 매트선택','7 견적','8 상담신청','9 완료'];
+let DATA={leads:[],stats:null,visits:[]};
+let curTab=1;
+async function jget(p){ try{const r=await fetch(base()+p);return await r.json();}catch(e){return null;} }
+async function loadAll(){
+  const [lj,st,vj]=await Promise.all([jget('/api/leads'),jget('/api/stats'),jget('/api/visits')]);
+  DATA.leads=(lj&&lj.leads)||[]; DATA.stats=st||{dwell:[]}; DATA.visits=vj||[];
+  renderKpis(); render();
+}
+function renderKpis(){
+  const s=DATA.stats||{};
+  $('kpis').innerHTML=[['방문',s.visits||DATA.visits.length],['세션',s.sessions||0],['상담신청(리드)',DATA.leads.length],
+    ['마케팅동의',DATA.leads.filter(l=>l.agreeMkt).length]].map(k=>'<div class="kpi"><b>'+k[1]+'</b><span>'+k[0]+'</span></div>').join('');
+}
+function tab(n){curTab=n;['t1','t2','t3'].forEach((id,i)=>$(id).classList.toggle('on',i===n-1));render();}
+function fmtMs(ms){ if(ms<1000)return ms+'ms'; const s=Math.round(ms/1000); if(s<60)return s+'초'; return Math.floor(s/60)+'분 '+(s%60)+'초'; }
+function esc(x){return String(x==null?'':x).replace(/</g,'&lt;');}
+function render(){
+  const p=$('panel');
+  if(curTab===1){
+    if(!DATA.leads.length){p.innerHTML='<div class="muted">접수된 고객이 없습니다.</div>';return;}
+    const rows=DATA.leads.slice().reverse().map(l=>{const c=l.cust||{};
+      return '<tr><td>'+esc((l.ts||'').replace('T',' ').slice(0,16))+'</td><td>'+esc(c.name)+'</td><td>'+esc(c.phone)+'</td>'
+      +'<td>'+esc(l.danji&&(l.danji.kaptName||l.danji))+'</td><td>'+esc(l.company)+'('+esc(l.L)+')</td>'
+      +'<td>'+esc(l.area)+'㎡</td><td>'+esc(l.orderTotal)+'장</td><td>'+(l.total?l.total.toLocaleString():'')+'원</td>'
+      +'<td class="'+(l.agreeMkt?'yes':'no')+'">'+(l.agreeMkt?'동의':'미동의')+'</td><td>'+esc(c.time)+'</td><td>'+esc(c.memo)+'</td></tr>';}).join('');
+    p.innerHTML='<div class="muted" style="margin-bottom:8px">개인정보(이름·연락처)는 동의 고객만 저장됩니다. 운영 시 본 화면은 접근 제한 필수.</div>'
+      +'<div class="scroll"><table><thead><tr><th>일시</th><th>이름</th><th>연락처</th><th>단지</th><th>매트</th><th>면적</th><th>발주</th><th>합계</th><th>마케팅</th><th>희망시간</th><th>메모</th></tr></thead><tbody>'+rows+'</tbody></table></div>';
+  }
+  else if(curTab===2){
+    const d=(DATA.stats&&DATA.stats.dwell)||[];
+    if(!d.length){p.innerHTML='<div class="muted">아직 체류 데이터가 없습니다. 고객이 앱을 사용하면 단계별 체류시간이 쌓입니다.</div>';return;}
+    const mx=Math.max.apply(0,d.map(x=>x.avgMs))||1;
+    const rows=d.map((x,i)=>'<tr><td>'+esc(STEP[x.step]||('STEP '+x.step))+'</td><td style="width:45%"><div class="bar'+(i===0?' warn':'')+'"><i style="width:'+Math.round(x.avgMs/mx*100)+'%"></i></div></td>'
+      +'<td>'+fmtMs(x.avgMs)+'</td><td>'+fmtMs(x.maxMs)+'</td><td>'+x.visits+'회</td></tr>').join('');
+    p.innerHTML='<div class="muted" style="margin-bottom:8px">평균 체류시간 내림차순. <b style="color:var(--warn)">맨 위 = 고객이 가장 오래 머문(=헤맨) 단계</b> → 개선 우선순위.</div>'
+      +'<table><thead><tr><th>단계</th><th>평균 체류(상대)</th><th>평균</th><th>최대</th><th>표본</th></tr></thead><tbody>'+rows+'</tbody></table>';
+  }
+  else{
+    if(!DATA.visits.length){p.innerHTML='<div class="muted">접속 기록이 없습니다.</div>';return;}
+    const rows=DATA.visits.slice().reverse().slice(0,200).map(v=>'<tr><td>'+esc((v.ts||'').replace('T',' ').slice(0,19))+'</td><td>'+esc(v.sessionId)+'</td><td style="white-space:normal">'+esc((v.ua||'').slice(0,80))+'</td></tr>').join('');
+    p.innerHTML='<div class="scroll"><table><thead><tr><th>접속 일시</th><th>세션</th><th>기기(UA)</th></tr></thead><tbody>'+rows+'</tbody></table></div>';
+  }
+}
+function csv(){
+  const head=['일시','이름','연락처','단지','매트','호칭','면적','발주','합계','마케팅동의','희망시간','메모'];
+  const lines=[head.join(',')].concat(DATA.leads.map(l=>{const c=l.cust||{};
+    return [l.ts,c.name,c.phone,(l.danji&&(l.danji.kaptName||l.danji))||'',l.company,l.L,l.area,l.orderTotal,l.total,l.agreeMkt?'동의':'미동의',c.time,(c.memo||'').replace(/,/g,' ')].map(x=>'"'+String(x==null?'':x)+'"').join(',');}));
+  const blob=new Blob(["﻿"+lines.join('\n')],{type:'text/csv'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='고객명단_'+new Date().toISOString().slice(0,10)+'.csv';a.click();
+}
+loadAll();
+</script>
+</body>
+</html>

@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>우리집 매트 견적 · 5분이면 끝!</title>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#2563eb">
+<link rel="apple-touch-icon" href="/icon.svg">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="매트견적">
+<style>
+  :root{--bg:#eef2f7;--card:#fff;--ink:#1f2733;--sub:#6b7785;--line:#e6ebf1;
+        --brand:#2563eb;--brand-d:#1d4ed8;--ok:#16a34a;--accent:#f59e0b;--warn:#b45309;
+        --center:#94a3b8;--side:#f59e0b;--corner:#ef4444;}
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  body{margin:0;font-family:'Segoe UI','Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:var(--bg);color:var(--ink);line-height:1.55}
+  .phone{max-width:430px;margin:0 auto;min-height:100vh;background:var(--bg);display:flex;flex-direction:column;position:relative}
+  .top{padding:14px 18px 8px;background:linear-gradient(135deg,#1e3a8a,#2563eb);color:#fff;position:relative}
+  .top .brand{font-size:13px;font-weight:700;opacity:.9}
+  .gear{position:absolute;right:14px;top:12px;background:rgba(255,255,255,.2);border:none;color:#fff;width:32px;height:32px;border-radius:9px;font-size:16px;cursor:pointer}
+  .bar{height:7px;background:rgba(255,255,255,.25);border-radius:10px;margin-top:8px;overflow:hidden}
+  .bar>i{display:block;height:100%;background:#fff;border-radius:10px;transition:width .35s ease;width:0}
+  .stepn{font-size:11px;opacity:.85;margin-top:5px}
+  main{flex:1;padding:18px;display:flex;flex-direction:column}
+  .ill{height:120px;display:flex;align-items:center;justify-content:center;margin:4px 0 6px}
+  .ill svg{height:118px;width:auto}
+  h1{font-size:21px;margin:6px 0 4px;font-weight:800;letter-spacing:-.3px}
+  .lead{font-size:14px;color:var(--sub);margin:0 0 14px}
+  .sec{font-size:12px;font-weight:700;color:var(--sub);margin:6px 0 6px}
+  .opt{display:block;width:100%;text-align:left;background:var(--card);border:2px solid var(--line);border-radius:14px;padding:15px 16px;font-size:16px;font-weight:600;margin-bottom:10px;cursor:pointer;transition:.15s}
+  .opt:hover,.opt.sel{border-color:var(--brand);background:#f5f9ff}
+  .opt small{display:block;font-weight:400;font-size:12px;color:var(--sub);margin-top:2px}
+  .chip{display:inline-block;background:var(--card);border:2px solid var(--line);border-radius:30px;padding:10px 18px;font-size:15px;font-weight:700;margin:0 8px 8px 0;cursor:pointer}
+  .chip.sel{border-color:var(--brand);background:#eaf2ff;color:var(--brand-d)}
+  input{width:100%;padding:13px 14px;border:2px solid var(--line);border-radius:12px;font-size:16px}
+  input:focus{outline:none;border-color:var(--brand)}
+  select{width:100%;padding:12px 10px;border:2px solid var(--line);border-radius:12px;font-size:15px;background:#fff}
+  .stepper{display:flex;align-items:center;justify-content:space-between;background:var(--card);border:2px solid var(--line);border-radius:14px;padding:8px 10px;margin-bottom:10px}
+  .stepper b{font-size:15px}
+  .stepper .v{font-size:20px;font-weight:800;min-width:80px;text-align:center}
+  .rb{width:40px;height:40px;border-radius:50%;border:none;background:#eef2f7;font-size:22px;font-weight:800;color:var(--brand);cursor:pointer}
+  .mrow{background:var(--card);border:2px solid var(--line);border-radius:14px;padding:10px;margin-bottom:10px}
+  .mrow .r{display:flex;gap:8px;margin-top:6px}.mrow .r>div{flex:1}
+  .lab{font-size:11px;color:var(--sub);margin-bottom:2px}
+  .nav{display:flex;gap:10px;margin-top:auto;padding-top:14px}
+  .btn{flex:1;background:var(--brand);color:#fff;border:none;padding:15px;border-radius:14px;font-size:16px;font-weight:700;cursor:pointer}
+  .btn:disabled{background:#cbd5e1}
+  .btn.ghost{flex:0 0 84px;background:#e7edf5;color:var(--ink)}
+  .link{display:inline-block;margin-top:6px;color:var(--brand-d);font-weight:700;font-size:14px;cursor:pointer;text-decoration:underline}
+  .hint{font-size:12px;color:var(--sub);margin-top:6px}
+  .toast{font-size:13px;color:var(--brand-d);background:#eaf2ff;border-radius:10px;padding:9px 12px;margin-bottom:10px;font-weight:600}
+  .warnb{font-size:13px;color:var(--warn);background:#fef3c7;border:1px solid #fcd34d;border-radius:10px;padding:9px 12px;margin:8px 0;font-weight:600}
+  .res-row{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px dashed var(--line);font-size:15px}
+  .res-row b{font-weight:800}
+  .big{font-size:30px;font-weight:900;color:var(--brand-d)}
+  .pill{display:inline-block;padding:2px 9px;border-radius:20px;font-size:12px;font-weight:700;margin:2px}
+  .pc{background:#eef1f5;color:#475569}.ps{background:#fef3c7;color:#b45309}.pk{background:#fee2e2;color:#b91c1c}
+  .card2{background:var(--card);border-radius:16px;padding:16px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+  .note{font-size:11px;color:var(--sub);margin-top:10px}
+  .fade{animation:fade .3s ease}@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  /* 설정 패널 */
+  .cfg{position:absolute;inset:0;background:#fff;z-index:10;overflow:auto;padding:18px;display:none}
+  .cfg.open{display:block}
+  .cfg h2{font-size:17px;margin:0 0 4px}
+  .cfg .grp{border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:12px}
+  .cfg .grp h3{font-size:13px;margin:0 0 8px;color:var(--brand-d)}
+  .cfg .ln{display:flex;align-items:center;gap:8px;margin-bottom:7px}
+  .cfg .ln label{flex:1;font-size:13px;color:var(--sub)}
+  .cfg .ln input{width:120px;padding:8px;font-size:14px}
+  .cfg .ck{display:flex;align-items:center;gap:6px;font-size:12px}
+  @media print{.top,.gear,.bar,.nav{display:none!important}.card2{box-shadow:none}}
+  .ck2{display:flex;gap:8px;align-items:flex-start;font-size:14px;font-weight:600;margin-top:10px}
+  .ck2 input{width:auto;margin-top:3px}
+  .terms{font-size:11px;color:var(--sub);background:#fff;border:1px solid var(--line);border-radius:8px;padding:9px;margin-top:6px;white-space:pre-line;max-height:170px;overflow:auto}
+  /* 용어 툴팁 (#5) */
+  .term{border-bottom:1px dotted var(--brand);cursor:help;color:inherit}
+  .term::after{content:'ⓘ';font-size:10px;color:var(--brand);vertical-align:super;margin-left:1px}
+  #tipbox{position:fixed;z-index:60;max-width:250px;background:#111827;color:#fff;font-size:12.5px;line-height:1.5;font-weight:500;padding:10px 12px;border-radius:10px;box-shadow:0 6px 24px rgba(0,0,0,.28);display:none}
+  #tipbox b{display:block;font-size:13px;margin-bottom:3px;color:#fde68a}
+  #tipbox:after{content:'';position:absolute;left:var(--ax,20px);bottom:-7px;border:7px solid transparent;border-top-color:#111827;border-bottom:0}
+  #tipbox.up:after{top:-7px;bottom:auto;border-top:0;border-bottom-color:#111827}
+  /* 상담 플로팅 버튼 (#4) */
+  .fab{position:fixed;z-index:55;right:calc(50% - 215px + 14px);bottom:20px;background:linear-gradient(135deg,#16a34a,#15803d);color:#fff;border:none;border-radius:30px;padding:12px 16px 12px 14px;font-size:14px;font-weight:800;box-shadow:0 6px 20px rgba(22,163,74,.4);cursor:pointer;display:flex;align-items:center;gap:6px;animation:fabpulse 2.4s ease-in-out infinite}
+  .fab .ic{font-size:18px}
+  @keyframes fabpulse{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+  @media(max-width:462px){.fab{right:14px}}
+  /* 상단 버튼 그룹 (#2) */
+  .topbtns{position:absolute;right:12px;top:11px;display:flex;gap:6px}
+  .tbtn{background:rgba(255,255,255,.2);border:none;color:#fff;width:32px;height:32px;border-radius:9px;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+  .tbtn:active{background:rgba(255,255,255,.35)}
+  /* 이동 메뉴 (#2) */
+  .menu{position:absolute;inset:0;background:rgba(15,23,42,.45);z-index:40;display:none}
+  .menu.open{display:block}
+  .menu .sheet{position:absolute;top:0;right:0;width:74%;max-width:300px;height:100%;background:#fff;box-shadow:-8px 0 24px rgba(0,0,0,.2);padding:16px;overflow:auto;animation:slidein .22s ease}
+  @keyframes slidein{from{transform:translateX(100%)}to{transform:none}}
+  .menu h3{margin:2px 0 10px;font-size:16px}
+  .menu .item{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:#f6f8fb;border:1px solid var(--line);border-radius:11px;padding:12px 13px;font-size:15px;font-weight:600;margin-bottom:8px;cursor:pointer}
+  .menu .item .n{width:22px;height:22px;border-radius:50%;background:var(--brand);color:#fff;font-size:12px;display:flex;align-items:center;justify-content:center;font-weight:800;flex:0 0 22px}
+  .menu .item.cur{border-color:var(--brand);background:#eaf2ff}
+  .menu .x{position:absolute;right:12px;top:12px;border:none;background:#eef2f7;width:30px;height:30px;border-radius:8px;font-size:16px;cursor:pointer}
+  /* 별점·후기 (#1) */
+  .stars{font-size:34px;letter-spacing:4px;cursor:pointer;user-select:none;color:#d1d5db}
+  .stars .on{color:#f59e0b}
+  .rev{border-left:3px solid var(--brand);padding:4px 0 4px 10px;margin:8px 0;font-size:13px;color:#334}
+  .rev .meta{font-size:11px;color:var(--sub);margin-top:2px}
+  textarea{font-family:inherit}
+  .vatline{display:flex;justify-content:space-between;font-size:13px;color:var(--sub);padding:3px 0}
+  .madeby{text-align:center;font-size:11px;color:var(--sub);margin-top:14px;padding-top:10px;border-top:1px solid var(--line)}
+  .madeby b{color:#334;font-weight:700}
+  .madeby .ver{display:inline-block;background:#eef2ff;color:var(--brand-d);font-weight:800;border-radius:20px;padding:1px 8px;margin-left:4px}
+
+</style>
+<script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+</head>
+<body>
+<div class="phone">
+  <div class="top">
+    <div class="brand">🧩 우리집 매트 견적</div>
+    <div class="topbtns"><button class="tbtn" onclick="goHome()" title="처음으로">🏠</button><button class="tbtn" onclick="toggleMenu()" title="메뉴">☰</button><button class="tbtn" onclick="toggleCfg()" title="관리자 설정">⚙</button></div>
+    <div class="bar"><i id="bar"></i></div>
+    <div class="stepn" id="stepn"></div>
+  </div>
+  <main id="screen"></main>
+  <div class="cfg" id="cfg"></div>
+  <div class="menu" id="menu" onclick="if(event.target===this)toggleMenu()"></div>
+  <button class="fab" id="fab" onclick="openConsult()" title="전문가 상담"><span class="ic">💬</span><span>상담요청</span></button>
+</div>
+<div id="tipbox" onclick="hideTip()"></div>
+
+<script>
+let TPL = {
+  '84_4베이':{label:'84㎡ · 방3 (4베이)', spaces:[
+    {name:'거실',w:3400,h:4200,shrinkH:1400,edges:{top:'open',bottom:'wall',left:'wall',right:'open'}},
+    {name:'주방',w:2600,h:3000,shrinkH:0,edges:{top:'open',bottom:'wall',left:'open',right:'wall'}},
+    {name:'복도',w:1200,h:3000,shrinkH:0,edges:{top:'open',bottom:'wall',left:'wall',right:'wall'}},
+    {name:'안방',w:3400,h:3600,shrinkH:1400,edges:{top:'open',bottom:'wall',left:'wall',right:'wall'}},
+    {name:'방2',w:3000,h:3000,shrinkH:1400,edges:{top:'open',bottom:'wall',left:'wall',right:'wall'}},
+    {name:'방3',w:2800,h:3000,shrinkH:1400,edges:{top:'open',bottom:'wall',left:'wall',right:'wall'}},
+  ]},
+  '84_3베이':{label:'84㎡ · 방3 (3베이)', spaces:[
+    {name:'거실',w:3800,h:4500,shrinkH:1400,edges:{top:'open',bottom:'wall',left:'wall',right:'open'}},
+    {name:'주방',w:2800,h:3200,shrinkH:0,edges:{top:'open',bottom:'wall',left:'open',right:'wall'}},
+    {name:'복도',w:1200,h:3400,shrinkH:0,edges:{top:'open',bottom:'wall',left:'wall',right:'wall'}},
+    {name:'안방',w:3500,h:3700,shrinkH:1400,edges:{top:'open',bottom:'wall',left:'wall',right:'wall'}},
+    {name:'방2',w:3000,h:3000,shrinkH:1400,edges:{top:'open',bottom:'wall',left:'wall',right:'wall'}},
+  ]},
+  '59_3베이':{label:'59㎡ · 방2~3 (3베이)', spaces:[
+    {name:'거실',w:3300,h:3800,shrinkH:1300,edges:{top:'open',bottom:'wall',left:'wall',right:'open'}},
+    {name:'주방',w:2400,h:2700,shrinkH:0,edges:{top:'open',bottom:'wall',left:'open',right:'wall'}},
+    {name:'복도',w:1100,h:2600,shrinkH:0,edges:{top:'open',bottom:'wall',left:'wall',right:'wall'}},
+    {name:'안방',w:3000,h:3200,shrinkH:1300,edges:{top:'open',bottom:'wall',left:'wall',right:'wall'}},
+    {name:'방2',w:2600,h:2800,shrinkH:1300,edges:{top:'open',bottom:'wall',left:'wall',right:'wall'}},
+  ]},
+  '39_원룸':{label:'39㎡ · 원룸~1.5룸 (17평)', spaces:[
+    {name:'거실',w:3000,h:3300,shrinkH:1200,edges:{top:'open',bottom:'wall',left:'wall',right:'open'}},
+    {name:'주방',w:2000,h:2200,shrinkH:0,edges:{top:'open',bottom:'wall',left:'open',right:'wall'}},
+    {name:'안방',w:2700,h:2900,shrinkH:1200,edges:{top:'open',bottom:'wall',left:'wall',right:'wall'}},
+  ]},
+  '49_2베이':{label:'49㎡ · 방2 (21평)', spaces:[
+    {name:'거실',w:3000,h:3500,shrinkH:1300,edges:{top:'open',bottom:'wall',left:'wall',right:'open'}},
+    {name:'주방',w:2200,h:2500,shrinkH:0,edges:{top:'open',bottom:'wall',left:'open',right:'wall'}},
+    {name:'복도',w:1100,h:2400,shrinkH:0,edges:{top:'open',bottom:'wall',left:'wall',right:'wall'}},
+    {name:'안방',w:2900,h:3100,shrinkH:1300,edges:{top:'open',bottom:'wall',left:'wall',right:'wall'}},
+    {name:'방2',w:2500,h:2700,shrinkH:1300,edges:{top:'open',bottom:'wall',left:'wall',right:'wall'}},
+  ]},
+  '74_3베이':{label:'74㎡ · 방3 (29평)', spaces:[
+    {name:'거실',w:3600,h:4200,shrinkH:1400,edges:{top:'open',bottom:'wall',left:'wall',right:'open'}},
+    {name:'주방',w:2600,h:2900,shrinkH:0,edges:{top:'open',bottom:'wall',left:'open',right:'wall'}},
+    {name:'복도',w:1200,h:2900,shrinkH:0,edges:{top:'open',bottom:'wall',left:'wall',right:'wall'}},
+    {name:'안방',w:3300,h:3500,shrinkH:1400,edges:{top:'open',bottom:'wall',left:'wall',right:'wall'}},
+    {name:'방2',w:2900,h:2900,shrinkH:1400,edges:{top:'open',bottom:'wall',left:'wall',right:'wall'}},
+    {name:'방3',w:2700,h:2900,shrinkH:1400,edges:{top:'open',bottom:'wall',left:'wall',right:'wall'}},
+  ]},
+  '99_4베이':{label:'99㎡ · 방3~4 (39평)', spaces:[
+    {name:'거실',w:4000,h:4500,shrinkH:1400,edges:{top:'open',bottom:'wall',left:'wall',right:'open'}},
+    {name:'주방',w:3000,h:3200,shrinkH:0,edges:{top:'open',bottom:'wall',left:'open',right:'wall'}},
+    {name:'복도',w:1300,h:3400,shrinkH:0,edges:{top:'open',bottom:'wall',left:'wall',right:'wall'}},
+    {name:'안방',w:3600,h:3900,shrinkH:1500,edges:{top:'open',bottom:'wall',left:'wall',right:'wall'}},
+    {name:'방2',w:3100,h:3100,shrinkH:1400,edges:{top:'open',bottom:'wall',left:'wall',right:'wall'}},
+    {name:'방3',w:3000,h:3000,shrinkH:1400,edges:{top:'open',bottom:'wall',left:'wall',right:'wall'}},
+  ]},
+  '114_4베이':{label:'114㎡ · 방4 (45평)', spaces:[
+    {name:'거실',w:4300,h:4800,shrinkH:1500,edges:{top:'open',bottom:'wall',left:'wall',right:'open'}},
+    {name:'주방',w:3200,h:3400,shrinkH:0,edges:{top:'open',bottom:'wall',left:'open',right:'wall'}},
+    {name:'복도',w:1300,h:3600,shrinkH:0,edges:{top:'open',bottom:'wall',left:'wall',right:'wall'}},
+    {name:'안방',w:3800,h:4100,shrinkH:1500,edges:{top:'open',bottom:'wall',left:'wall',right:'wall'}},
+    {name:'방2',w:3200,h:3200,shrinkH:1400,edges:{top:'open',bottom:'wall',left:'wall',right:'wall'}},
+    {name:'방3',w:3100,h:3100,shrinkH:1400,edges:{top:'open',bottom:'wall',left:'wall',right:'wall'}},
+  ]},
+  '134_4베이':{label:'134㎡ · 방4 (49평)', spaces:[
+    {name:'거실',w:4800,h:5200,shrinkH:1600,edges:{top:'open',bottom:'wall',left:'wall',right:'open'}},
+    {name:'주방',w:3400,h:3600,shrinkH:0,edges:{top:'open',bottom:'wall',left:'open',right:'wall'}},
+    {name:'복도',w:1400,h:3800,shrinkH:0,edges:{top:'open',bottom:'wall',left:'wall',right:'wall'}},
+    {name:'안방',w:4000,h:4300,shrinkH:1600,edges:{top:'open',bottom:'wall',left:'wall',right:'wall'}},
+    {name:'방2',w:3300,h:3300,shrinkH:1400,edges:{top:'open',bottom:'wall',left:'wall',right:'wall'}},
+    {name:'방3',w:3200,h:3200,shrinkH:1400,edges:{top:'open',bottom:'wall',left:'wall',right:'wall'}},
+  ]},
+};
+const MATS=[{name:'600 매트',L:600,s:24,thick:2.4},{name:'680 매트',L:680,s:35,thick:3.5},{name:'800 매트',L:800,s:43,thick:4.3},{name:'1200 매트',L:1200,s:0,thick:5.0}];
+const COMPANIES=MATS; // 하위호환 별칭
+const PROXY=(location.protocol.indexOf('http')===0)?location.origin:'http://localhost:4000';
+const APP_VER='V1.0';
+const ELASTIC=4, MINREUSE=100;
+
+/* ===== 단가 설정 (관리자, localStorage 저장) ===== */
+const DEFAULT_CFG={
+  matAllIn:{600:28000,680:30000,800:44000,1200:140000}, // 장당 단가(자재+시공 포함)
+  visitFee:100000,                                       // 출장비(임계 장수 미만 시) 정액
+  visitThresh:{600:70,680:70,800:50,1200:0},            // 이 장수 미만이면 출장비 발생, 0=출장비 없음
+  cutFee:30000,                                          // 재단비(별도·예외) 건당
+  vatMode:'included',                                    // 'included'=표시가에 VAT 포함(현행 유지) / 'excluded'=공급가+10%
+  valueProps:['친환경 TPU 소재 · 유해물질 걱정 ↓','층간소음·충격 흡수 + 미끄럼 방지','전문 시공 + 시공 후 A/S'],
+  reviews:['아이가 뛰어도 아랫집 항의가 사라졌어요 — 마포 ○○님(예시)','반나절 만에 깔끔하게 끝났어요 — 송파 ○○님(예시)'],
+};
+let CFG=loadCfg();
+function loadCfg(){ try{const s=localStorage.getItem('matCfg'); if(s){const o=JSON.parse(s); return Object.assign(JSON.parse(JSON.stringify(DEFAULT_CFG)),o);} }catch(e){} return JSON.parse(JSON.stringify(DEFAULT_CFG)); }
+function saveCfg(){ try{localStorage.setItem('matCfg',JSON.stringify(CFG));}catch(e){} }
+function unitPrice(L){ return (CFG.matAllIn&&CFG.matAllIn[L])||0; }
+
+function axisCells(dim,oS,oE,L,s,el){let u=dim;if(!oS)u-=el;if(!oE)u-=el;if(u<L)return{cells:1,overhang:Math.max(0,L-u)};const occS=oS?L+s:L,occE=oE?L+s:L,it=(u-occS-occE)>0?Math.ceil((u-occS-occE)/L):0;return{cells:it+2,overhang:(occS+occE+it*L)-u};}
+function savedOf(count,L,cutW){if(cutW<=1||count<=0)return 0;const p=(L-cutW>=MINREUSE)?Math.floor(L/cutW):1;return count-Math.ceil(count/p);}
+function calc(sp,L,s){
+  const ax=axisCells(sp.w,sp.edges.left==='open',sp.edges.right==='open',L,s,ELASTIC);
+  const ay=axisCells(sp.h,sp.edges.top==='open',sp.edges.bottom==='open',L,s,ELASTIC);
+  const Mw=ax.cells,Mh=ay.cells,O=sp.edges;let c=0,si=0,k=0;
+  for(let r=0;r<Mh;r++)for(let col=0;col<Mw;col++){const t=r===0,b=r===Mh-1,l=col===0,ri=col===Mw-1;
+    const corner=(t&&l&&O.top==='open'&&O.left==='open')||(t&&ri&&O.top==='open'&&O.right==='open')||(b&&l&&O.bottom==='open'&&O.left==='open')||(b&&ri&&O.bottom==='open'&&O.right==='open');
+    const open=(t&&O.top==='open')||(b&&O.bottom==='open')||(l&&O.left==='open')||(ri&&O.right==='open');
+    if(corner)k++;else if(open)si++;else c++;}
+  const cw=ax.overhang>1?L-ax.overhang:0,ch=ay.overhang>1?L-ay.overhang:0;
+  const saved=savedOf(Mh,L,cw)+savedOf(Math.max(0,Mw-1),L,ch);
+  return{c,si,k,saved,area:(sp.w*sp.h)/1e6};
+}
+function edgesFromOpen(o){ if(o>=2)return{top:'open',bottom:'wall',left:'wall',right:'open'}; if(o==1)return{top:'open',bottom:'wall',left:'wall',right:'wall'}; return{top:'wall',bottom:'wall',left:'wall',right:'wall'}; }
+function scopeSpaces(){
+  if(A.manualMode){ return A.manual.filter(m=>m.w>0&&m.h>0).map(m=>({name:m.name||'공간',w:+m.w,h:+m.h,edges:edgesFromOpen(+m.open)})); }
+  const t=TPL[A.templateKey]; if(!t)return[];
+  const zoneMap={living:['거실'],living_hall:['거실','복도'],living_hall_island:['거실','복도','주방'],living_hall_kitchen:['거실','복도','주방']};
+  const roomMap={'방1':'안방','방2':'방2','방3':'방3'};
+  let names=(zoneMap[A.zone]||[]).slice();
+  (A.rooms||[]).forEach(r=>{ if(roomMap[r]) names.push(roomMap[r]); });
+  const pick=[]; names.forEach(n=>{ const sp=t.spaces.find(x=>x.name===n); if(sp&&pick.indexOf(sp)<0)pick.push(sp); });
+  const liv=t.spaces.find(x=>x.name==='거실'); const lscale=(A.livingW>0&&liv&&liv.w>0)?(A.livingW/liv.w):1;
+  return pick.map(s=>{const ov=(A.dim&&A.dim[s.name])||{};const bw=s.w*lscale;const bh=(A.extend?s.h:Math.max(s.h-(s.shrinkH||0),s.w))*lscale;return {name:s.name,edges:s.edges,w:(ov.w>0?+ov.w:Math.round(bw)),h:(ov.h>0?+ov.h:Math.round(bh))};});
+}
+function estimate(){
+  const comp=MATS[A.company]||MATS[0];
+  let C=0,S=0,K=0,saved=0,area=0;
+  scopeSpaces().forEach(sp=>{const r=calc(sp,comp.L,comp.s);C+=r.c;S+=r.si;K+=r.k;saved+=r.saved;area+=r.area;});
+  const doorSides=Math.max(0,(A.doors||0)-(A.doorsFlush||0)); S+=doorSides;
+  const net=Math.max(0,(C+S+K)-saved);
+  const orderC=Math.ceil(C*1.05), orderS=S+3, orderK=K, orderTotal=orderC+orderS+orderK;
+  const laid=C+S+K;                                   // 그리드 산출(격자)
+  const unitArea=(comp.L*comp.L)/1e6;
+  const areaCount=Math.ceil(area/unitArea);           // 면적 산출(시공면적÷매트면적)
+  const gridCount=laid;
+  const midCount=Math.max(1,Math.round((areaCount+gridCount)/2)); // 중간값(추천)
+  const unit=(CFG.matAllIn&&CFG.matAllIn[comp.L])||0; // 자재+시공 포함 장당단가
+  const matLabor=midCount*unit;                       // 가격은 중간값 기준
+  const thr=(CFG.visitThresh&&CFG.visitThresh[comp.L]!=null)?CFG.visitThresh[comp.L]:0;
+  const visit=(thr>0 && midCount<thr)?(CFG.visitFee||0):0; // 임계 미만이면 출장비
+  const cutCount=Math.max(0,(A.cuts||0));
+  const cutCost=cutCount*(CFG.cutFee||0);             // 재단비(별도·예외)
+  const total=matLabor+visit+cutCost;
+  const vatMode=(CFG.vatMode)||'included';
+  let supply,vat,grand;
+  if(vatMode==='excluded'){ supply=total; vat=Math.round(total*0.1); grand=supply+vat; }
+  else { grand=total; supply=Math.round(total/1.1); vat=grand-supply; }
+  return{comp,C,S,K,doorSides,saved,net,orderC,orderS,orderK,orderTotal,laid,areaCount,gridCount,midCount,unit,thr,area,matLabor,visit,cutCount,cutCost,total,vatMode,supply,vat,grand};
+}
+
+const A={step:0,danji:null,templateKey:null,extend:true,zone:'living_hall_kitchen',rooms:[],manualMode:false,manual:[{name:'거실',w:5000,h:3400,open:2}],company:0,doors:0,doorsFlush:0,pantry:0,cuts:0,dim:{},showDim:false,livingW:0,planImg:null,cust:{name:'',phone:'',addr:'',addrBase:'',addrDetail:'',addrVerified:false,zonecode:'',time:'아무 때나',memo:''},agreeReq:true,agreeMkt:false,showReq:false,showMkt:false,events:[],quickKey:null,quickScope:'all',quickFrom:false,rev:{}};
+const STEPS=['시작','단지 찾기','평형/구조','발코니','시공 범위','문 확인','매트 선택','견적 완성'];
+const $=id=>document.getElementById(id);
+const ILL={
+  home:'<svg viewBox="0 0 120 120"><rect x="20" y="50" width="80" height="55" rx="6" fill="#dbeafe"/><path d="M14 54 L60 22 L106 54 Z" fill="#2563eb"/><rect x="52" y="74" width="16" height="31" fill="#fff"/><rect x="30" y="64" width="14" height="14" rx="2" fill="#fff"/><rect x="76" y="64" width="14" height="14" rx="2" fill="#fff"/></svg>',
+  search:'<svg viewBox="0 0 120 120"><circle cx="54" cy="54" r="30" fill="none" stroke="#2563eb" stroke-width="9"/><line x1="76" y1="76" x2="100" y2="100" stroke="#2563eb" stroke-width="11" stroke-linecap="round"/></svg>',
+  layout:'<svg viewBox="0 0 120 120"><rect x="16" y="20" width="88" height="80" rx="6" fill="#fff" stroke="#94a3b8" stroke-width="3"/><line x1="60" y1="20" x2="60" y2="100" stroke="#cbd5e1" stroke-width="3"/><line x1="16" y1="60" x2="104" y2="60" stroke="#cbd5e1" stroke-width="3"/><rect x="20" y="24" width="36" height="32" fill="#dbeafe"/></svg>',
+  sun:'<svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="22" fill="#f59e0b"/><g stroke="#f59e0b" stroke-width="6" stroke-linecap="round"><line x1="60" y1="14" x2="60" y2="2"/><line x1="60" y1="106" x2="60" y2="118"/><line x1="14" y1="60" x2="2" y2="60"/><line x1="106" y1="60" x2="118" y2="60"/><line x1="28" y1="28" x2="20" y2="20"/><line x1="92" y1="28" x2="100" y2="20"/><line x1="28" y1="92" x2="20" y2="100"/><line x1="92" y1="92" x2="100" y2="100"/></g></svg>',
+  door:'<svg viewBox="0 0 120 120"><rect x="38" y="18" width="44" height="84" rx="3" fill="#dbeafe" stroke="#2563eb" stroke-width="3"/><circle cx="72" cy="62" r="4" fill="#2563eb"/><rect x="30" y="100" width="60" height="6" fill="#f59e0b"/></svg>',
+  mat:'<svg viewBox="0 0 120 120"><g stroke="#fff" stroke-width="2"><rect x="20" y="20" width="26" height="26" fill="#94a3b8"/><rect x="46" y="20" width="26" height="26" fill="#94a3b8"/><rect x="72" y="20" width="26" height="26" fill="#f59e0b"/><rect x="20" y="46" width="26" height="26" fill="#94a3b8"/><rect x="46" y="46" width="26" height="26" fill="#94a3b8"/><rect x="72" y="46" width="26" height="26" fill="#f59e0b"/><rect x="20" y="72" width="26" height="26" fill="#f59e0b"/><rect x="46" y="72" width="26" height="26" fill="#f59e0b"/><rect x="72" y="72" width="26" height="26" fill="#ef4444"/></g></svg>',
+  party:'<svg viewBox="0 0 120 120"><path d="M30 100 L54 40 L86 78 Z" fill="#f59e0b"/><circle cx="54" cy="40" r="8" fill="#2563eb"/><g fill="#ef4444"><circle cx="92" cy="30" r="4"/><circle cx="26" cy="34" r="4"/><circle cx="100" cy="70" r="4"/></g><g fill="#16a34a"><circle cx="80" cy="20" r="3"/><circle cx="40" cy="22" r="3"/></g></svg>',
+};
+const CHEER=['','단지만 찾으면 절반은 끝이에요 😎','구조만 고르면 술술 풀려요','거의 다 왔어요, 햇빛 한 줌만!','어디에 깔지만 콕!','딱 하나만 더 여쭤볼게요 🙏','마지막 선택이에요, 약속!','짠! 견적이 나왔어요 🎉'];
+function setBar(){const sd=Math.min(A.step,STEPS.length-1);const p=Math.min(100,Math.round(sd/(STEPS.length-1)*100));$('bar').style.width=p+'%';$('stepn').textContent='STEP '+sd+' / '+(STEPS.length-1)+(CHEER[sd]?' · '+CHEER[sd]:'');}
+const SID=Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+let _enter=Date.now();
+function go(n){ A.events.push({step:A.step,dwellMs:Date.now()-_enter}); _enter=Date.now(); A.step=n; render(); }
+function sessionState(){ return {sessionId:SID, lastStep:A.step, events:A.events,
+  state:{templateKey:A.templateKey,zone:A.zone,rooms:A.rooms,manualMode:A.manualMode,extend:A.extend,company:A.company,doors:A.doors,doorsFlush:A.doorsFlush,pantry:A.pantry,cuts:A.cuts,danji:A.danji?A.danji.kaptName:null,agreeReq:A.agreeReq,agreeMkt:A.agreeMkt}}; }
+function sendSession(){ try{ const blob=new Blob([JSON.stringify(sessionState())],{type:'application/json'});
+  if(navigator.sendBeacon) navigator.sendBeacon(PROXY+'/api/session',blob);
+  else fetch(PROXY+'/api/session',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(sessionState()),keepalive:true}); }catch(e){} }
+try{ fetch(PROXY+'/api/visit',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sessionId:SID,ref:document.referrer||''})}); }catch(e){}
+document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='hidden') sendSession(); });
+window.addEventListener('pagehide',sendSession);
+function nav(backTo,nextFn,nextLabel,enabled){return '<div class="nav">'+(backTo!=null?'<button class="btn ghost" onclick="go('+backTo+')">이전</button>':'')+'<button class="btn" '+(enabled===false?'disabled':'')+' onclick="('+nextFn+')()">'+(nextLabel||'다음')+'</button></div>';}
+const won=n=>n.toLocaleString('ko-KR');
+
+function render(){
+  setBar(); hideTip(); const fb=document.getElementById('fab'); if(fb) fb.style.display=(A.step===8||A.step===11)?'none':'flex';
+  const s=$('screen'); s.innerHTML=''; void s.offsetWidth; s.className='fade';
+  if(A.step===0){
+    s.innerHTML='<div class="ill">'+ILL.home+'</div><h1>딱 5분이면<br>우리집 매트 견적 끝!</h1><p class="lead">질문 몇 개만 톡톡 누르면 돼요. 어려운 계산은 저희가 다 할게요 😉</p>'+'<button class="opt" style="text-align:center;border-color:var(--brand);color:var(--brand-d);background:#f5f9ff" onclick="go(10)">⚡ 30초 빠른 견적 — 평형만 알아도 OK</button>'+nav(null,'()=>go(1)','차근차근 시작하기 →')+'<div class="madeby"><b>블루오션코리아</b>가 제작해 무료로 제공하는 앱입니다 <span class="ver">'+APP_VER+'</span></div>';
+  }
+  else if(A.step===1){
+    const d=A.danji?'<div class="toast">선택됨: '+A.danji.kaptName+'</div>':'';
+    s.innerHTML='<div class="ill">'+ILL.search+'</div><h1>우리 아파트 찾기</h1><p class="lead">이름 일부만 쳐도 돼요. (예: 푸르지오, 센트럴자이)</p>'+d
+      +'<input id="dkw" placeholder="아파트 이름" value="'+(A.danji?A.danji.kaptName:'')+'" oninput="dSearch(this.value)" onkeydown="dKey(event,this.value)"><div id="dres" style="margin-top:8px"></div>'
+      +'<p class="hint">잘 안 찾아져도 괜찮아요. 다음 화면에서 직접 고르면 돼요!</p>'
+      +'<button class="opt" style="text-align:center;color:var(--brand-d);border-style:dashed" onclick="startManual()">🏠 아파트가 아니에요 — 주택·빌라·상가 (직접 실측 입력)</button>'
+      +nav(0,'()=>go(2)','건너뛰고 직접 선택 →');
+  }
+  else if(A.step===2){
+    s.innerHTML='<div class="ill">'+ILL.layout+'</div><h1>평형·구조 선택</h1><p class="lead">우리집과 가장 비슷한 걸 골라주세요. 정확한 치수는 뒤에서 맞춰요!</p>'
+      +Object.keys(TPL).map(k=>'<button class="opt'+(A.templateKey===k?' sel':'')+'" onclick="A.templateKey=\''+k+'\';render()">'+TPL[k].label+'</button>').join('')+nav(1,'()=>go(3)','다음',!!A.templateKey);
+  }
+  else if(A.step===3){
+    s.innerHTML='<div class="ill">'+ILL.sun+'</div><h1>발코니, '+tip('확장','expand')+'하셨나요?</h1><p class="lead">확장하면 거실·방이 더 넓어져요. 모르면 "확장"으로 두세요.</p>'
+      +'<button class="opt'+(A.extend?' sel':'')+'" onclick="A.extend=true;render()">네, 확장했어요 ☀️<small>거실/방이 발코니까지 넓어진 상태</small></button>'
+      +'<button class="opt'+(!A.extend?' sel':'')+'" onclick="A.extend=false;render()">아니요, 그대로예요<small>발코니 창이 따로 있어요</small></button>'+nav(2,'()=>go(4)','다음');
+  }
+  else if(A.step===4){
+    if(A.manualMode){
+      let rows=A.manual.map((m,i)=>'<div class="mrow"><input value="'+(m.name||'')+'" placeholder="공간 이름 (예: 거실)" onchange="mU('+i+',\'name\',this.value)">'
+        +'<div class="r"><div><div class="lab">가로(mm)</div><input type="number" value="'+m.w+'" oninput="mU('+i+',\'w\',this.value)"></div>'
+        +'<div><div class="lab">세로(mm)</div><input type="number" value="'+m.h+'" oninput="mU('+i+',\'h\',this.value)"></div>'
+        +'<div><div class="lab">트인 면</div><select onchange="mU('+i+',\'open\',this.value)"><option value="0"'+(m.open==0?' selected':'')+'>사방 벽</option><option value="1"'+(m.open==1?' selected':'')+'>한 면 트임</option><option value="2"'+(m.open==2?' selected':'')+'>두 면 트임</option></select></div></div>'
+        +'<div class="link" onclick="mDel('+i+')">삭제</div></div>').join('');
+      s.innerHTML='<div class="ill">'+ILL.layout+'</div><h1>직접 입력</h1><p class="lead">공간마다 가로·세로(mm)와 트인 면 수를 넣어주세요.</p>'
+        +rows+'<button class="opt" style="text-align:center;color:var(--brand-d)" onclick="mAdd()">+ 공간 추가</button>'
+        +'<div class="link" onclick="A.manualMode=false;render()">← 목록에서 고르기로 돌아가기</div>'+nav(3,'()=>go(5)','다음', A.manual.some(m=>m.w>0&&m.h>0));
+    } else {
+      const zones=[['living','거실'],['living_hall','거실 + 복도'],['living_hall_island','거실 + 복도 + 아일랜드'],['living_hall_kitchen','거실 + 복도 + 주방']];
+      const rooms=['방1','방2','방3'];
+      const sps=scopeSpaces();
+      const quick = A.showDim ? (
+        '<div class="mrow"><div style="font-weight:600;margin-bottom:6px">⚡ 빠른 보정 — 거실 가로 폭만 알면 충분</div>'
+        +'<input type="number" placeholder="거실 가로 폭(mm) 예: 3500" value="'+(A.livingW||'')+'" oninput="A.livingW=+this.value||0"><div class="hint" style="margin-top:4px">이 한 값으로 평면 전체를 비례 보정해요. (입력 1회로 정확도 ↑)</div></div>'
+        +'<div class="mrow"><div style="font-weight:600;margin-bottom:6px">🖼️ 평면도 올리기 (참고용)</div><input type="file" accept="image/*" onchange="loadPlanImg(this)">'+(A.planImg?'<img src="'+A.planImg+'" style="max-width:100%;margin-top:8px;border:1px solid var(--line);border-radius:8px">':'<div class="hint" style="margin-top:4px">올린 도면을 보며 치수를 넣을 수 있어요.</div>')+'</div>'
+      ) : '';
+      const dimInputs = A.showDim ? (quick+(sps.length?('<p class="hint" style="margin:6px 0">📏 더 정밀하게 — 공간별 가로·세로(벽~벽 안쪽). 비워두면 위 보정값/평형 기본값으로 계산돼요.</p>'
+        + sps.map(sp=>'<div class="mrow"><div style="font-weight:600;margin-bottom:6px">'+sp.name+'</div><div class="r"><div><div class="lab">가로(mm)</div><input type="number" value="'+sp.w+'" oninput="dimU(\''+sp.name+'\',\'w\',this.value)"></div><div><div class="lab">세로(mm)</div><input type="number" value="'+sp.h+'" oninput="dimU(\''+sp.name+'\',\'h\',this.value)"></div></div></div>').join('')):'')) : '';
+      const dimToggle = sps.length ? '<div class="link" onclick="A.showDim=!A.showDim;render()">'+(A.showDim?'▾ 실측 치수 접기':'✏️ 더 정확하게 — 실측 치수 직접 넣기 (선택)')+'</div>' : '';
+      s.innerHTML='<div class="ill">'+ILL.layout+'</div><h1>어디에 깔까요?</h1><p class="lead">공용부와 방만 고르면 평형 기본 치수로 <b>대략 견적</b>이 나와요. (실측은 선택)</p>'
+        +'<div class="sec">공용부 (하나 선택)</div>'+zones.map(z=>'<button class="opt'+(A.zone===z[0]?' sel':'')+'" onclick="A.zone=\''+z[0]+'\';render()">'+z[1]+'</button>').join('')
+        +'<div class="sec">방 추가 (여러 개 선택 가능)</div><div>'+rooms.map(r=>'<span class="chip'+(A.rooms.indexOf(r)>=0?' sel':'')+'" onclick="toggleRoom(\''+r+'\')">'+r+'</span>').join('')+'</div>'
+        +dimToggle+dimInputs
+        +'<div class="link" onclick="A.manualMode=true;render()">또는 처음부터 직접 입력할게요(주택·빌라) →</div>'
+        +'<p class="hint" style="margin-top:4px">ㄱ자·비정형(이형)은 \'직접 입력\'에서 사각형 여러 개로 쪼개 넣으면, 붙여 놓은 부분은 자동으로 연속 처리돼요.</p>'+nav(3,'()=>go(5)','다음', !!A.zone||A.rooms.length>0);
+    }
+  }
+  else if(A.step===5){
+    s.innerHTML='<div class="ill">'+ILL.door+'</div><h1>출입구·문 확인</h1><p class="lead">매트가 닿는 출입구를 알려주세요. 가장자리 마감 때문에 따로 세요.</p>'
+      +'<div class="stepper"><b>출입구(문) 개수</b><div style="display:flex;align-items:center;gap:8px"><button class="rb" onclick="bump(\'doors\',-1)">−</button><span class="v" id="vd">'+A.doors+'</span><button class="rb" onclick="bump(\'doors\',1)">+</button></div></div>'
+      +'<div class="stepper"><b>턱 높은 문 🚪<br><small style="font-weight:400;color:var(--sub)">문턱 1.5cm↑ 또는 발코니문</small></b><div style="display:flex;align-items:center;gap:8px"><button class="rb" onclick="bump(\'doorsFlush\',-1)">−</button><span class="v" id="vf">'+A.doorsFlush+'</span><button class="rb" onclick="bump(\'doorsFlush\',1)">+</button></div></div>'
+      +'<div class="stepper"><b>재단 발생(별도) ✂️<br><small style="font-weight:400;color:var(--sub)">예외 발생 시 건당 '+won(CFG.cutFee)+'원</small></b><div style="display:flex;align-items:center;gap:8px"><button class="rb" onclick="bump(\'cuts\',-1)">−</button><span class="v" id="vp">'+A.cuts+'</span><button class="rb" onclick="bump(\'cuts\',1)">+</button></div></div>'
+      +'<p class="hint">턱 높은 문·발코니문은 직각으로 끊어 사이드에서 빼요. 모르면 0으로 두세요!</p>'+nav(4,'()=>go(6)','다음');
+  }
+  else if(A.step===6){
+    s.innerHTML='<div class="ill">'+ILL.mat+'</div><h1>매트 크기 선택</h1><p class="lead">원하는 매트 크기(호칭)를 고르세요. 크기에 따라 장수와 금액이 달라져요.</p>'
+      +MATS.map((c,i)=>'<button class="opt'+(A.company===i?' sel':'')+'" onclick="A.company='+i+';render()">'+c.L+' 매트<small>호칭 '+c.L+'mm · '+(c.s>0?'경사 '+c.s+'mm':'직각마감')+' · '+won((CFG.matAllIn&&CFG.matAllIn[c.L])||0)+'원/장(자재+시공)</small></button>').join('')+nav(5,'()=>go(7)','견적 보기 🎉');
+  }
+  else if(A.step===7){
+    const e=estimate();
+    if(e.area<=0){ s.innerHTML='<div class="ill">'+ILL.layout+'</div><h1>앗, 범위가 비었어요</h1><p class="lead">시공 범위를 하나 이상 골라주세요 🙂</p>'+nav(4,'()=>go(4)','범위 다시 고르기'); return; }
+    s.innerHTML='<div class="ill">'+ILL.party+'</div><h1>견적이 나왔어요!</h1>'
+      +'<div class="card2"><div style="text-align:center;margin-bottom:8px"><div class="hint">예상 시공면적</div><div class="big">'+e.area.toFixed(1)+' ㎡</div></div>'
+      +'<div class="res-row"><span>'+tip('매트 종류별','matkind')+'</span><span><span class="pill pc">센터 '+e.C+'</span><span class="pill ps">사이드 '+e.S+'</span><span class="pill pk">코너 '+e.K+'</span></span></div>'
+      +'<div class="res-row"><span>'+tip('수량 산출','count')+'<br><small style="color:var(--sub)">면적 '+e.areaCount+'장 ~ 그리드 '+e.gridCount+'장</small></span><b>추천 '+e.midCount+'장</b></div>'
+      +'<div class="res-row"><span>'+tip('자투리 재사용 절감','reuse')+'</span><b style="color:var(--ok)">-'+e.saved+'장</b></div>'
+      +'<div class="res-row"><span><b>'+tip('발주 권장 수량','order')+'</b><br><small style="color:var(--sub)">센터+5%·사이드+3 포함</small></span><b>'+e.orderTotal+'장</b></div></div>'
+      +'<div class="card2"><div class="res-row"><span>시공 (자재+시공 포함)<br><small style="color:var(--sub)">추천 '+e.midCount+'장(중간값) × '+won(e.unit)+'원/장 · '+e.comp.L+' 매트</small></span><b>'+won(e.matLabor)+'원</b></div>'
+      +(e.visit>0?'<div class="res-row"><span>'+tip('출장비','visit')+'<br><small style="color:var(--sub)">추천 '+e.midCount+'장 < '+e.thr+'장</small></span><b>'+won(e.visit)+'원</b></div>':'<div class="res-row"><span>'+tip('출장비','visit')+'</span><b>없음</b></div>')
+      +(e.cutCost>0?'<div class="res-row"><span>'+tip('재단비','cut')+' (별도)<br><small style="color:var(--sub)">'+e.cutCount+'건 × '+won(CFG.cutFee)+'원</small></span><b>'+won(e.cutCost)+'원</b></div>':'')
+      +'<div class="vatline"><span>공급가액</span><span>'+won(e.supply)+'원</span></div>'
+      +'<div class="vatline"><span>'+tip('부가세(10%)','vat')+'</span><span>'+won(e.vat)+'원</span></div>'
+      +'<div class="res-row" style="border:none"><span class="big" style="font-size:16px">'+tip('부가세 포함 합계','vatinc')+'</span><span class="big" style="font-size:24px">'+won(e.grand)+'원</span></div></div>'
+      +(e.vatMode==='excluded'?'<div class="warnb">💡 위 공급가액에 <b>부가세 10%('+won(e.vat)+'원)</b>가 더해진 <b>'+won(e.grand)+'원</b>이 실제 내실 금액이에요. 소비자가 놓치기 쉬운 10%를 미리 붙여드렸어요.</div>':'<div class="warnb">💡 표시 금액은 <b>부가세(VAT) 10% 포함</b> 최종가예요. \'부가세 별도\'로 착각해 나중에 10%가 더 붙는 일은 없어요.</div>')
+      +(e.doorSides>0?'<div class="toast">출입구 '+e.doorSides+'곳은 경사 마감(사이드)으로 반영했어요.</div>':'')
+      +'<p class="note">※ '+e.comp.L+' 매트 기준 추정치예요. 깔리는 장수에 자재+시공 포함 단가를 적용했고, 재단비는 별도 발생 시에만 더해져요. 현장 실측으로 최종 확정됩니다.</p>'
+      +infoCard(e)+consentBlock()+sendQuoteCard()+reviewTeaser()
+      +(A.danji?'<button class="btn ghost" style="margin-bottom:10px" onclick="saveDanjiTemplate()">📌 이 단지·평형 정밀값 저장 (전문가용 — 다음부터 자동적용)</button>':'')
+      +'<button class="btn" style="margin-bottom:10px;background:'+(A.agreeReq?'#16a34a':'#cbd5e1')+'" '+(A.agreeReq?'':'disabled')+' onclick="shareQuote()">📄 견적서 저장·공유</button>'
+      +'<div class="nav"><button class="btn ghost" onclick="go(0)">처음</button><button class="btn" '+(A.agreeReq?'':'disabled')+' onclick="go(8)">전문가 상담 →</button></div>';
+    setTimeout(function(){loadReviews('revList');},30);
+  }
+  else if(A.step===8){
+    s.innerHTML='<div class="ill">'+ILL.home+'</div><h1>전문가 상담 신청</h1><p class="lead">연락처만 남기면 전문가가 정확한 실측·견적으로 연락드려요. 30초면 돼요 🙂</p>'
+      +'<div class="lab">성함</div><input value="'+(A.cust.name||'')+'" oninput="A.cust.name=this.value" placeholder="홍길동" style="margin-bottom:10px">'
+      +'<div class="lab">연락처</div><input value="'+(A.cust.phone||'')+'" oninput="A.cust.phone=this.value;phoneHint(this)" placeholder="010-1234-5678" inputmode="numeric" style="margin-bottom:2px">'
+      +'<div class="hint" id="phchk" style="margin-bottom:10px;color:'+(A.cust.phone?(validPhone(A.cust.phone)?'var(--ok)':'#b91c1c'):'')+'">'+(A.cust.phone?(validPhone(A.cust.phone)?'✓ 올바른 휴대폰 번호예요':'⚠ 휴대폰 번호를 정확히 (010으로 시작, 총 10~11자리)'):'숫자만 입력해도 돼요')+'</div>'
+      +addrField(A.cust)
+      +'<div class="lab">연락 희망 시간</div><select onchange="A.cust.time=this.value" style="margin-bottom:10px;width:100%"><option'+(A.cust.time=='아무 때나'?' selected':'')+'>아무 때나</option><option'+(A.cust.time=='오전'?' selected':'')+'>오전</option><option'+(A.cust.time=='오후'?' selected':'')+'>오후</option><option'+(A.cust.time=='저녁'?' selected':'')+'>저녁</option></select>'
+      +'<div class="lab">남기실 말 (선택)</div><input value="'+(A.cust.memo||'')+'" oninput="A.cust.memo=this.value" placeholder="예: 거실만 급해요">'
+      +consentBlock()
+      +nav(7,'submitLead','신청 완료 →', validPhone(A.cust.phone));
+  }
+  else if(A.step===9){
+    const e=estimate();
+    s.innerHTML='<div class="ill">'+ILL.party+'</div><h1>신청 완료! 🎉</h1><p class="lead">'+(A.cust.name||'고객')+'님, 곧 전문가가 연락드릴게요. 아래 견적 요약을 저장해두세요.</p>'
+      +'<div class="card2"><div class="res-row"><span>매트</span><b>'+e.comp.name+' ('+e.comp.L+')</b></div><div class="res-row"><span>면적 / 추천수량</span><b>'+e.area.toFixed(1)+'㎡ / '+e.midCount+'장</b></div><div class="res-row" style="border:none"><span class="big" style="font-size:16px">예상 합계</span><span class="big" style="font-size:22px">'+won(e.total)+'원</span></div></div>'
+      +'<button class="btn" style="margin-bottom:10px;background:#16a34a" onclick="shareQuote()">📄 견적서 저장·공유</button>'
+      +'<button class="btn ghost" style="margin-bottom:10px;width:100%;flex:none" onclick="go(11)">✏️ 후기 남기기</button>'
+      +'<div class="nav"><button class="btn ghost" onclick="go(0)">처음으로</button></div>';
+  }
+  else if(A.step===10){   /* ⚡ 빠른 견적 (#7) */
+    if(!A.quickKey)A.quickKey=Object.keys(TPL)[0];
+    s.innerHTML='<div class="ill">'+ILL.layout+'</div><h1>딱 두 가지만!</h1><p class="lead">평형과 범위만 고르면 <b>대략 견적</b>이 바로 나와요. 정확한 값은 언제든 실측으로 맞춰요 🙂</p>'
+      +'<div class="sec">평형 (우리집과 가까운 것)</div>'
+      +'<select onchange="A.quickKey=this.value" style="margin-bottom:12px">'+Object.keys(TPL).map(function(k){return '<option value="'+k+'"'+(A.quickKey===k?' selected':'')+'>'+TPL[k].label+'</option>';}).join('')+'</select>'
+      +'<div class="sec">어디에 깔까요?</div>'
+      +[['all','집 전체 (거실+주방+방 전부)'],['public','거실·주방·복도만'],['rooms','방만 (안방·작은방)']].map(function(o){return '<button class="opt'+(A.quickScope===o[0]?' sel':'')+'" onclick="A.quickScope=\''+o[0]+'\';render()">'+o[1]+'</button>';}).join('')
+      +'<div class="sec">매트 크기 · '+tip('경사 마감이란?','bevel')+'</div><div>'+MATS.map(function(c,i){return '<span class="chip'+(A.company===i?' sel':'')+'" onclick="A.company='+i+';render()">'+c.L+'</span>';}).join('')+'</div>'
+      +'<p class="hint" style="margin-top:8px">금액은 '+tip('부가세 10% 포함','vat')+'으로 보여드려요. 더 정밀하게 하려면 아래 \'자세히\'로!</p>'
+      +'<div class="nav"><button class="btn ghost" onclick="go(0)">처음</button><button class="btn ghost" style="flex:1" onclick="go(1)">자세히</button><button class="btn" onclick="runQuick()">견적 보기 🎉</button></div>';
+  }
+  else if(A.step===11){   /* ⭐ 고객 후기 (#1) */
+    const rv=A.rev||{};
+    s.innerHTML='<div class="ill">'+ILL.party+'</div><h1>고객 후기</h1><p class="lead">시공 경험을 짧게 남겨주세요. 다른 이웃에게 큰 힘이 돼요 💛</p>'
+      +'<div class="card2"><div class="sec" style="margin-top:0">별점</div>'
+      +'<div class="stars" id="starsPick">'+[1,2,3,4,5].map(function(i){return '<span data-v="'+i+'" onclick="setRating('+i+')" class="'+((rv.rating||0)>=i?'on':'')+'">★</span>';}).join('')+'</div>'
+      +'<div class="lab" style="margin-top:10px">닉네임 (선택)</div><input value="'+esc(rv.nick||'')+'" oninput="setRev(\'nick\',this.value)" placeholder="예: 마포 이웃" style="margin-bottom:10px">'
+      +'<div class="lab">아파트·지역 (선택)</div><input value="'+esc(rv.danji||'')+'" oninput="setRev(\'danji\',this.value)" placeholder="예: 송파 ○○아파트" style="margin-bottom:10px">'
+      +'<div class="lab">후기 내용</div><textarea oninput="setRev(\'text\',this.value)" placeholder="예: 아이가 뛰어도 조용해졌어요. 시공도 반나절 만에 끝!" style="width:100%;min-height:90px;border:2px solid var(--line);border-radius:12px;padding:12px;font-size:15px">'+esc(rv.text||'')+'</textarea>'
+      +'<button class="btn" style="margin-top:12px;width:100%;flex:none" onclick="submitReview()">후기 등록 →</button></div>'
+      +'<div class="card2"><div class="sec" style="margin-top:0">최근 후기</div><div id="revFull"><div class="hint">불러오는 중…</div></div></div>'
+      +'<div class="nav"><button class="btn ghost" onclick="go(0)">처음</button><button class="btn" onclick="go(10)">⚡ 빠른 견적</button></div>';
+    setTimeout(function(){loadReviews('revFull');},30);
+  }
+}
+
+function toggleRoom(r){const i=A.rooms.indexOf(r); if(i>=0)A.rooms.splice(i,1); else A.rooms.push(r); render();}
+function startManual(){A.manualMode=true;A.danji=null;A.templateKey=null;go(4);}
+function mAdd(){A.manual.push({name:'',w:3000,h:3000,open:1});render();}
+function mU(i,f,v){A.manual[i][f]=(f==='name')?v:(+v);}
+function mDel(i){A.manual.splice(i,1);render();}
+function dimU(name,f,v){ if(!A.dim[name])A.dim[name]={}; A.dim[name][f]=Math.max(0,+v||0); }
+function bump(key,d){A[key]=Math.max(0,(A[key]||0)+d);
+  if(A.doorsFlush>A.doors)A.doorsFlush=A.doors;
+  const m={doors:'vd',doorsFlush:'vf',cuts:'vp'}; const el=$(m[key]); if(el)el.textContent=A[key];
+  if(key==='doors'){const f=$('vf');if(f)f.textContent=A.doorsFlush;}}
+let dT=null;
+function dSearch(v){clearTimeout(dT);const box=$('dres');if(!v||v.trim().length<1){box.innerHTML='';return;}
+  dT=setTimeout(()=>dRun(v),300);}
+async function dRun(v){const box=$('dres');if(!box||!v||!v.trim())return;box.innerHTML='<p class="hint">검색 중…</p>';try{const r=await fetch(PROXY+'/api/danji/search?keyword='+encodeURIComponent(v.trim()));const d=await r.json();
+    if(d.error){box.innerHTML='<p class="hint" style="color:#b91c1c;white-space:pre-wrap">⚠ 서버 응답: '+d.error+'</p>';return;}
+    if(!d.items||!d.items.length){box.innerHTML='<p class="hint">검색 결과 없음 — 건너뛰고 직접 선택해도 돼요!</p>';return;}
+    const items=(d.items||[]).slice().sort((a,b)=>(((a.sido||'')+(a.sigungu||'')+a.kaptName)).localeCompare(((b.sido||'')+(b.sigungu||'')+b.kaptName),'ko'));
+    const total=d.count||items.length;
+    box.innerHTML='<div class="hint" style="margin:2px 0 6px">"'+v.trim()+'" 검색결과 '+total+'개'+(total>items.length?' · 상위 '+items.length+'개 표시 (이름을 더 입력하면 좁혀져요)':'')+'</div>'
+      +'<div style="max-height:55vh;overflow-y:auto">'+items.map(it=>'<button class="opt" onclick="pickDanji(\''+it.kaptCode+'\',\''+it.kaptName.replace(/\x27/g,"")+'\')">'+it.kaptName+'<small>'+(it.sido||'')+' '+(it.sigungu||'')+'</small></button>').join('')+'</div>';
+  }catch(e){box.innerHTML='<p class="hint" style="color:#b91c1c">⚠ 연결 실패: '+(e&&e.message?e.message:e)+'</p>';}}
+function dKey(e,v){if(e.key!=='Enter')return;e.preventDefault();const box=$('dres');const first=box&&box.querySelector('button.opt');if(first){first.click();return;}clearTimeout(dT);dRun(v);}
+async function pickDanji(code,name){A.danji={kaptCode:code,kaptName:name};A.dim={};A.livingW=0;
+  try{const r=await fetch(PROXY+'/api/danji/detail?kaptCode='+code);const d=await r.json();const u=d.areaUnits||{};
+    const cls=[['60이하',u['60이하']||0],['60~85',u['60~85']||0],['85~135',u['85~135']||0],['135초과',u['135초과']||0]].sort((a,b)=>b[1]-a[1]);
+    const map={'60이하':'59_3베이','60~85':'84_4베이','85~135':'99_4베이','135초과':'134_4베이'};
+    A.templateKey=(cls[0][1]>0?map[cls[0][0]]:null)||'84_4베이';}catch(e){A.templateKey=A.templateKey||'84_4베이';}
+  try{const tr=await fetch(PROXY+'/api/danji/template?kaptCode='+code+'&key='+encodeURIComponent(A.templateKey));const td=await tr.json();if(td){if(td.dim)A.dim=td.dim;if(td.livingW)A.livingW=td.livingW;}}catch(e){}
+  go(2);}
+function loadPlanImg(inp){const f=inp.files&&inp.files[0];if(!f)return;const r=new FileReader();r.onload=e=>{A.planImg=e.target.result;render();};r.readAsDataURL(f);}
+async function saveDanjiTemplate(){ if(!A.danji){alert('단지를 먼저 선택하세요.');return;} try{await fetch(PROXY+'/api/danji/template',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({kaptCode:A.danji.kaptCode,key:A.templateKey,dim:A.dim,livingW:A.livingW})}); alert('이 단지·평형의 정밀값을 저장했어요. 다음부터 같은 단지·평형은 자동 적용돼요.'); }catch(e){alert('저장 실패 — 서버 연결을 확인하세요.');} }
+
+const REQ_TERMS='[필수] 개인정보 수집·이용 동의\n\n1) 수집 항목: 성함, 연락처, 주소(아파트 단지·동), 견적 관련 정보(평형·시공범위·치수 등)\n2) 수집·이용 목적: 층간소음 매트 시공 견적 산출, 견적서 발송·출력, 상담 연락 및 시공 진행\n3) 보유·이용 기간: 동의일로부터 상담·계약 목적 달성 시까지(미계약 시 최대 1년) 보관 후 지체 없이 파기\n4) 동의 거부 권리 및 불이익: 동의를 거부하실 수 있으나, 거부 시 견적서 발송·출력 및 상담 진행이 제한됩니다.';
+const MKT_TERMS='[선택] 마케팅 활용 및 광고성 정보 수신 동의\n\n1) 수집·이용 목적: 신상품·이벤트·할인 혜택 등 광고성 정보의 안내 및 발송(전화·문자메시지·카카오톡 등)\n2) 보유·이용 기간: 동의 철회 시 또는 고객 정보 파기 시까지\n3) 동의 거부 권리: 거부하실 수 있으며, 거부하셔도 견적·상담 서비스 이용에는 제한이 없습니다.\n\n※ 본 동의는 선택사항이며, 거부와 무관하게 견적·상담을 받으실 수 있습니다.';
+function consentBlock(){
+  return '<div class="card2" style="background:#f8fafc"><div class="sec" style="margin-top:0">개인정보 동의</div>'
+    +'<label class="ck2"><input type="checkbox" '+(A.agreeReq?'checked':'')+' onchange="A.agreeReq=this.checked;render()"> <span><b style="color:#b91c1c">[필수]</b> 개인정보 수집·이용 동의 (견적·상담)</span></label>'
+    +'<div class="link" onclick="A.showReq=!A.showReq;render()">'+(A.showReq?'약관 접기':'약관 전문 보기')+'</div>'+(A.showReq?'<div class="terms">'+REQ_TERMS+'</div>':'')
+    +'<label class="ck2"><input type="checkbox" '+(A.agreeMkt?'checked':'')+' onchange="A.agreeMkt=this.checked"> <span>[선택] 마케팅·광고성 정보 수신 동의</span></label>'
+    +'<div class="link" onclick="A.showMkt=!A.showMkt;render()">'+(A.showMkt?'약관 접기':'약관 전문 보기')+'</div>'+(A.showMkt?'<div class="terms">'+MKT_TERMS+'</div>':'')
+    +(A.agreeReq?'':'<div class="hint" style="color:#b91c1c;font-weight:600">※ 필수 동의에 체크해야 견적서 저장·전송·상담이 가능합니다.</div>')
+    +'</div>';
+}
+function sizeCompare(){ const cur=A.company; const out=MATS.map((c,i)=>{A.company=i;const e=estimate();return {L:c.L,total:e.total};}); A.company=cur; return out; }
+function infoCard(e){
+  const bc=sizeCompare(); const mn=Math.min.apply(0,bc.map(b=>b.total));
+  const rows=bc.map(b=>'<div class="res-row"><span>'+(b.L===e.comp.L?'<b>▶ '+b.L+' 매트</b>':b.L+' 매트')+'</span><b>'+won(b.total)+'원'+(b.total===mn?' <span style="color:var(--ok);font-size:11px">최저</span>':'')+'</b></div>').join('');
+  const vps=(CFG.valueProps||[]).map(v=>'<div style="font-size:13px;margin:3px 0">✅ '+v+'</div>').join('');
+  const rvs=(CFG.reviews||[]).filter(Boolean).map(r=>'<div style="font-size:13px;border-left:3px solid var(--brand);padding:3px 0 3px 10px;margin:6px 0;color:#334">"'+r+'"</div>').join('');
+  return '<div class="card2"><div class="sec" style="margin-top:0">🔎 매트 크기별 예상 비교</div>'+rows
+    +'<div class="hint" style="margin-top:4px">같은 조건·현재 단가 기준 계산값이에요. 매트가 클수록 장수↓.</div>'
+    +(vps?'<div class="sec">왜 우리에게?</div>'+vps:'')
+    +(rvs?'<div class="sec">고객 후기</div>'+rvs:'')+'</div>';
+}
+function quoteText(){const e=estimate();const ZL={living:'거실',living_hall:'거실+복도',living_hall_island:'거실+복도+아일랜드',living_hall_kitchen:'거실+복도+주방'};const rng=(A.manualMode?'직접입력':((ZL[A.zone]||'')+(A.rooms&&A.rooms.length?' +'+A.rooms.join(','):'')));
+  return ['[우리집 매트 견적]',
+    (A.manualMode?'유형: 주택·빌라·기타 (직접 실측)':((A.danji?'단지: '+A.danji.kaptName:'')+(A.templateKey?' / '+TPL[A.templateKey].label:''))),
+    '범위: '+rng, (A.cust.addr?'주소: '+A.cust.addr:''), '매트: '+e.comp.L+' 매트',
+    '면적: '+e.area.toFixed(1)+'㎡ / 수량 면적'+e.areaCount+'~그리드'+e.gridCount+' → 추천 '+e.midCount+'장 / 발주 '+e.orderTotal+'장',
+    '시공(자재+시공 포함) '+won(e.matLabor)+'원'+(e.visit?', 출장비 '+won(e.visit)+'원':'')+(e.cutCost?', 재단비 '+won(e.cutCost)+'원':''),
+    '예상 합계: '+won(e.total)+'원', '※ 현장 실측 후 확정'].filter(Boolean).join('\n');}
+async function shareQuote(){ if(!A.agreeReq){alert('개인정보 수집·이용 동의(필수)에 체크해 주세요.');go(7);return;} const txt=quoteText();
+  if(navigator.share){try{await navigator.share({title:'우리집 매트 견적',text:txt});return;}catch(e){}}
+  try{await navigator.clipboard.writeText(txt);alert('견적 내용을 복사했어요!\n카톡·메모에 붙여넣기 하세요. (PDF로 저장하려면 인쇄→PDF)');}
+  catch(e){window.print();}}
+async function submitLead(){
+  if(!A.agreeReq){alert('개인정보 수집·이용 동의(필수)에 체크해 주세요.');go(7);return;}
+  const e=estimate();
+  const payload={cust:A.cust,agreeReq:A.agreeReq,agreeMkt:A.agreeMkt,danji:A.danji,
+    company:e.comp.name,L:e.comp.L,area:+e.area.toFixed(2),orderTotal:e.orderTotal,total:e.total,summary:quoteText(),sessionId:SID,events:A.events};
+  try{ await fetch(PROXY+'/api/lead',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)}); }
+  catch(err){ try{localStorage.setItem('lead_'+Date.now(),JSON.stringify(payload));}catch(e){} }
+  go(9);
+}
+
+/* ===== 관리자 설정 패널 ===== */
+function toggleCfg(){const p=$('cfg');if(p.classList.contains('open')){p.classList.remove('open');render();}else{renderCfg();p.classList.add('open');}}
+function renderCfg(){
+  const c=$('cfg');
+  const allin=[600,680,800,1200].map(L=>'<div class="ln"><label>'+L+' 장당(자재+시공)</label><input type="number" value="'+((CFG.matAllIn&&CFG.matAllIn[L])||0)+'" oninput="CFG.matAllIn['+L+']=+this.value"></div>').join('');
+  const thr=[600,680,800,1200].map(L=>'<div class="ln"><label>'+L+' 출장비 임계(장)</label><input type="number" value="'+((CFG.visitThresh&&CFG.visitThresh[L])||0)+'" oninput="CFG.visitThresh['+L+']=+this.value"></div>').join('');
+  c.innerHTML='<h2>⚙ 관리자 설정</h2><p class="hint">단가는 언제든 바꿀 수 있어요. 저장하면 이 기기에 기억됩니다.</p>'
+    +'<div class="grp"><h3>장당 단가 (자재+시공 포함, 호칭별)</h3>'+allin+'</div>'
+    +'<div class="grp"><h3>출장비</h3><div class="ln"><label>출장비(정액)</label><input type="number" value="'+CFG.visitFee+'" oninput="CFG.visitFee=+this.value"></div>'+thr+'<p class="hint">깔리는 장수가 임계 미만이면 출장비가 붙어요. 0이면 그 크기는 출장비 없음(예: 1200).</p></div>'
+    +'<div class="grp"><h3>재단비 (별도·예외)</h3><div class="ln"><label>재단비/건</label><input type="number" value="'+CFG.cutFee+'" oninput="CFG.cutFee=+this.value"></div></div>'
+    +'<div class="grp"><h3>부가세(VAT) 표기</h3><div class="ck"><label><input type="radio" name="vatm" '+(CFG.vatMode!=='excluded'?'checked':'')+' onchange="CFG.vatMode=\'included\'"> 표시가에 VAT 포함 (현행)</label></div><div class="ck"><label><input type="radio" name="vatm" '+(CFG.vatMode==='excluded'?'checked':'')+' onchange="CFG.vatMode=\'excluded\'"> 공급가 입력 → 합계에 10% 추가</label></div><p class="hint">결과화면엔 공급가·부가세·합계를 항상 분리 표기해요.</p></div>'
+    +'<div class="grp"><h3>결과화면 콘텐츠</h3>'+'<div class="lab">가치 포인트 (한 줄에 하나)</div><textarea style="width:100%;min-height:64px;border:1px solid var(--line);border-radius:8px;padding:8px;font-size:13px" oninput="CFG.valueProps=this.value.split(String.fromCharCode(10)).map(function(x){return x.trim();}).filter(Boolean)">'+(CFG.valueProps||[]).join(String.fromCharCode(10))+'</textarea>'+'<div class="lab" style="margin-top:8px">고객 후기 (한 줄에 하나)</div><textarea style="width:100%;min-height:80px;border:1px solid var(--line);border-radius:8px;padding:8px;font-size:13px" oninput="CFG.reviews=this.value.split(String.fromCharCode(10)).map(function(x){return x.trim();}).filter(Boolean)">'+(CFG.reviews||[]).join(String.fromCharCode(10))+'</textarea>'+'<div class="hint">저장하면 견적 결과화면에 바로 반영돼요.</div></div>'
+    +'<div class="nav"><button class="btn ghost" onclick="CFG=JSON.parse(JSON.stringify(DEFAULT_CFG));renderCfg()">기본값</button><button class="btn" onclick="saveCfg();toggleCfg()">저장하고 닫기</button></div>';
+}
+/* ===== 용어 툴팁 (#5) ===== */
+const TERMS={
+ vat:{t:'부가세(VAT) 10%',d:'물건·서비스값에 붙는 나라 세금이에요. 10%라 은근 큰데 소비자는 자주 잊죠. 그래서 미리 합계에 넣어드려요 — 계산서 보고 놀라지 않게요.'},
+ vatinc:{t:'부가세 포함 합계',d:'이 금액이 지갑에서 나가는 진짜 최종가예요. \'부가세 별도\'가 아니라 10%까지 다 넣은 값이에요.'},
+ matkind:{t:'센터·사이드·코너',d:'매트도 자리마다 역할이 달라요. 가운데(센터)는 평평, 가장자리(사이드)는 경사 마감, 모서리(코너)는 두 방향 경사. 발끝 안 걸리게 하려는 배려죠.'},
+ order:{t:'발주 권장 수량',d:'실제 깔 장수에 여유분을 살짝 더한 수예요. 시공 중 손실·오차 대비용 — 모자라 공사 멈추는 것보단 낫잖아요.'},
+ reuse:{t:'자투리 재사용',d:'자르고 남은 조각을 버리지 않고 다른 자리에 재활용해 아낀 장수예요. 알뜰함은 최고의 미덕이죠 😉'},
+ visit:{t:'출장비',d:'주문 양이 적으면 붙는 방문 비용이에요. 많이 깔면(임계치 이상) 무료! 라면 한 봉 사러 먼 길 가는 기름값 같은 거예요.'},
+ cut:{t:'재단비',d:'특이한 구조라 매트를 따로 잘라야 할 때만, 건당 붙는 비용이에요. 평범한 집은 대개 0원이에요.'},
+ count:{t:'면적 vs 그리드 산출',d:'면적식은 바닥넓이÷매트, 그리드식은 실제 격자로 한 장씩 세는 방식. 둘의 중간값을 추천해 과·소 주문을 피해요.'},
+ expand:{t:'발코니 확장',d:'베란다 벽을 터서 거실·방을 넓힌 구조예요. 넓어진 만큼 매트도 더 들어가요. 모르겠으면 \'확장\'으로 두세요 — 요즘 집 대부분이 그래요.'},
+ bevel:{t:'경사 마감 / 직각',d:'가장자리를 비스듬히 깎으면(경사) 발끝이 안 걸려요. 직각은 딱 떨어지는 대신 문턱처럼 살짝 턱이 져요.'},
+ thresh:{t:'턱 높은 문',d:'문턱이 1.5cm 넘거나 발코니문처럼 단차 있는 문이에요. 매트를 직각으로 끊어 마감해서 따로 세어요.'},
+};
+function tip(label,key){ return '<span class="term" data-k="'+key+'" onclick="showTip(event)">'+label+'</span>'; }
+function showTip(ev){ ev.stopPropagation(); const el=ev.currentTarget; const t=TERMS[el.getAttribute('data-k')]; if(!t)return;
+  const box=$('tipbox'); box.className=''; box.innerHTML='<b>'+t.t+'</b>'+t.d; box.style.display='block';
+  const r=el.getBoundingClientRect(); const bw=box.offsetWidth, bh=box.offsetHeight;
+  let left=r.left+r.width/2-bw/2; left=Math.max(8,Math.min(left,window.innerWidth-bw-8));
+  let top=r.top-bh-10; if(top<8){ top=r.bottom+10; box.classList.add('up'); }
+  box.style.left=left+'px'; box.style.top=top+'px';
+  const ax=r.left+r.width/2-left-7; box.style.setProperty('--ax',Math.max(8,Math.min(ax,bw-16))+'px'); }
+function hideTip(){ const b=$('tipbox'); if(b)b.style.display='none'; }
+document.addEventListener('click',function(e){ if(!(e.target.closest&&e.target.closest('.term'))&&e.target.id!=='tipbox') hideTip(); },true);
+
+/* ===== 어디서든 메인·메뉴 이동 (#2) ===== */
+const MENU_STEPS=[[0,'처음 화면'],[10,'빠른 견적'],[1,'단지 찾기'],[2,'평형·구조'],[4,'시공 범위'],[6,'매트 선택'],[7,'견적 결과'],[8,'전문가 상담'],[11,'고객 후기']];
+function toggleMenu(){ const m=$('menu'); if(m.classList.contains('open')){ m.classList.remove('open'); } else { renderMenu(); m.classList.add('open'); } }
+function renderMenu(){ $('menu').innerHTML='<div class="sheet"><button class="x" onclick="toggleMenu()">✕</button><h3>🧭 어디로 갈까요?</h3>'
+  +MENU_STEPS.map(function(s){ return '<button class="item'+(A.step===s[0]?' cur':'')+'" onclick="menuGo('+s[0]+')"><span class="n">'+(s[0]===11?'★':s[0]===10?'⚡':s[0])+'</span>'+s[1]+'</button>'; }).join('')
+  +'<div class="hint" style="margin-top:6px">지금: '+(STEPS[Math.min(A.step,STEPS.length-1)]||'')+' · '+APP_VER+'</div><div class="hint" style="margin-top:2px">ⓒ 블루오션코리아</div></div>'; }
+function menuGo(n){ $('menu').classList.remove('open'); go(n); }
+function goHome(){ hideTip(); $('menu').classList.remove('open'); const c=$('cfg'); if(c)c.classList.remove('open'); go(0); }
+function openConsult(){ hideTip(); $('menu').classList.remove('open'); go(8); }
+
+/* ===== 최소입력 빠른 견적 (#7) ===== */
+function runQuick(){ if(!A.quickKey)A.quickKey=Object.keys(TPL)[0];
+  A.templateKey=A.quickKey; A.manualMode=false; A.extend=true; A.dim={}; A.livingW=0;
+  const map={ all:['living_hall_kitchen',['방1','방2','방3']], public:['living_hall_kitchen',[]], rooms:['none',['방1','방2','방3']] };
+  const m=map[A.quickScope]||map.all; A.zone=m[0]; A.rooms=m[1].slice();
+  A.doors=0; A.doorsFlush=0; A.cuts=0; A.quickFrom=true; go(7); }
+
+/* ===== 견적서 문자 발송 (#3) ===== */
+function validPhone(p){ return /^01[016789][0-9]{7,8}$/.test((p||'').replace(/[^0-9]/g,'')); }
+function syncAddr(){ const c=A.cust; const parts=[]; if(c.addrBase)parts.push(c.addrBase); if(c.addrDetail)parts.push(c.addrDetail); c.addr=parts.join(' '); }
+function setAddrDetail(v){ A.cust.addrDetail=v; syncAddr(); }
+function openPostcode(){ if(typeof daum==='undefined'||!daum.Postcode){ alert('주소 검색을 불러오지 못했어요. 인터넷 연결을 확인해 주세요.'); return; }
+  new daum.Postcode({ oncomplete:function(data){ const c=A.cust; c.addrBase=data.roadAddress||data.jibunAddress||''; c.zonecode=data.zonecode||''; c.addrVerified=true; syncAddr(); render(); } }).open(); }
+function phoneHint(inp){ const el=document.getElementById('phchk'); if(!el)return; const v=inp.value; const ok=validPhone(v); el.textContent=v?(ok?'✓ 올바른 휴대폰 번호예요':'⚠ 휴대폰 번호를 정확히 (010으로 시작, 총 10~11자리)'):'숫자만 입력해도 돼요'; el.style.color=v?(ok?'var(--ok)':'#b91c1c'):''; }
+function addrField(c){
+  return '<div class="lab">주소</div>'
+   +'<div style="display:flex;gap:8px;margin-bottom:8px"><input value="'+esc(c.addrBase||'')+'" placeholder="주소 검색을 눌러 실제 주소 선택" readonly onclick="openPostcode()" style="flex:1;background:#f8fafc;cursor:pointer"><button class="btn" style="flex:0 0 92px;padding:0" onclick="openPostcode()">🔍 검색</button></div>'
+   +(c.addrVerified?('<input value="'+esc(c.addrDetail||'')+'" oninput="setAddrDetail(this.value)" placeholder="상세주소 (동·호수)" style="margin-bottom:6px"><div class="hint" style="color:var(--ok);margin-bottom:8px">✓ 실제 주소로 확인됐어요'+(c.zonecode?' ('+esc(c.zonecode)+')':'')+'</div>'):'<div class="hint" style="margin-bottom:8px">※ 실주소 확인을 위해 \'주소 검색\'으로 골라주세요.</div>'); }
+function sendQuoteCard(){ const c=A.cust||{}; const pv=validPhone(c.phone);
+  return '<div class="card2"><div class="sec" style="margin-top:0">📱 견적서 문자로 받기</div>'
+   +'<p class="hint" style="margin:0 0 8px">이름·전화번호·주소를 남기고 <b>개인정보 동의</b>에 체크하면 이 견적서를 문자로 보내드려요.</p>'
+   +'<div class="lab">이름</div><input value="'+esc(c.name||'')+'" oninput="A.cust.name=this.value" placeholder="홍길동" style="margin-bottom:8px">'
+   +'<div class="lab">휴대폰 번호</div><input value="'+esc(c.phone||'')+'" oninput="A.cust.phone=this.value;phoneHint(this)" placeholder="010-1234-5678" inputmode="numeric" style="margin-bottom:2px">'
+   +'<div class="hint" id="phchk" style="margin-bottom:8px;color:'+(c.phone?(pv?'var(--ok)':'#b91c1c'):'')+'">'+(c.phone?(pv?'✓ 올바른 휴대폰 번호예요':'⚠ 휴대폰 번호를 정확히 (010으로 시작, 총 10~11자리)'):'숫자만 입력해도 돼요')+'</div>'
+   +addrField(c)
+   +'<button class="btn" style="background:'+(A.agreeReq?'#2563eb':'#cbd5e1')+'" '+(A.agreeReq?'':'disabled')+' onclick="sendQuoteSMS()">📨 이 번호로 견적서 발송</button>'
+   +'<div class="hint" style="margin-top:6px'+(A.agreeReq?'':';color:#b91c1c')+'">'+(A.agreeReq?'위 개인정보 동의 후 발송돼요.':'※ 위 [필수] 개인정보 수집·이용 동의 후 발송돼요.')+'</div></div>'; }
+async function sendQuoteSMS(){ if(!A.agreeReq){ alert('개인정보 수집·이용 동의(필수)에 체크해 주세요.'); return; }
+  const c=A.cust||{};
+  if(!c.name||!c.name.trim()){ alert('이름을 입력해 주세요 🙂'); return; }
+  if(!validPhone(c.phone)){ alert('휴대폰 번호를 정확히 입력해 주세요. (010으로 시작, 총 10~11자리)'); return; }
+  if(!c.addrVerified||!c.addrBase){ alert('주소 검색으로 실제 주소를 선택해 주세요 🏠'); return; }
+  const e=estimate();
+  const lead={cust:{name:c.name,phone:c.phone,addr:c.addr,time:c.time||'-',memo:c.memo||''},agreeReq:A.agreeReq,agreeMkt:A.agreeMkt,danji:A.danji,company:e.comp.name,L:e.comp.L,area:+e.area.toFixed(2),orderTotal:e.orderTotal,total:e.grand,summary:quoteText(),sessionId:SID,source:'quote_send'};
+  try{ await fetch(PROXY+'/api/lead',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(lead)}); }catch(_){}
+  try{ const r=await fetch(PROXY+'/api/quote/send',{method:'POST',headers:{'Content-Type':'application/json'},
+       body:JSON.stringify({name:c.name,phone:c.phone,addr:c.addr,summary:quoteText(),company:e.comp.name,total:e.grand,agreeReq:A.agreeReq,agreeMkt:A.agreeMkt,zonecode:c.zonecode,addrVerified:true})});
+    const d=await r.json();
+    if(d.delivered){ alert('✅ '+c.name+'님 번호로 견적서를 발송했어요!'); }
+    else if(d.error){ alert('⚠ '+d.error); }
+    else{ alert('✅ '+(d.note||'접수되었습니다. 곧 문자로 보내드릴게요.')); }
+  }catch(err){ alert('서버 연결을 확인해 주세요.'); } }
+
+/* ===== 고객 후기 (#1) ===== */
+function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
+function stars(n){ n=Math.max(0,Math.min(5,n|0)); return '<span style="color:#f59e0b;letter-spacing:2px">'+'★'.repeat(n)+'<span style="color:#d1d5db">'+'★'.repeat(5-n)+'</span></span>'; }
+function reviewTeaser(){ return '<div class="card2"><div class="sec" style="margin-top:0">⭐ 고객 후기</div><div id="revList"><div class="hint">후기 불러오는 중…</div></div><button class="btn ghost" style="margin-top:8px;width:100%;flex:none" onclick="go(11)">✏️ 후기 남기기</button></div>'; }
+async function loadReviews(elId){ const el=$(elId); if(!el)return; const many=(elId==='revFull');
+  try{ const r=await fetch(PROXY+'/api/reviews'); const d=await r.json(); const list=(d.reviews||[]).slice(0,many?50:3);
+    if(!list.length){ el.innerHTML='<div class="hint">아직 후기가 없어요. 첫 후기의 주인공이 되어보세요! 🌟</div>'; return; }
+    el.innerHTML=list.map(function(rv){ return '<div class="rev">'+stars(rv.rating)+'<div style="margin-top:2px">'+esc(rv.text)+'</div><div class="meta">'+esc(rv.nick)+(rv.danji?' · '+esc(rv.danji):'')+' · '+rv.date+'</div></div>'; }).join('');
+  }catch(e){ el.innerHTML='<div class="hint">후기를 불러오지 못했어요(서버 연결 확인).</div>'; } }
+function setRating(v){ A.rev=A.rev||{}; A.rev.rating=v; const sp=document.querySelectorAll('#starsPick span'); sp.forEach(function(x){ x.className=(+x.getAttribute('data-v')<=v)?'on':''; }); }
+function setRev(f,v){ A.rev=A.rev||{}; A.rev[f]=v; }
+async function submitReview(){ const rv=A.rev||{};
+  if(!rv.rating){ alert('별점을 선택해 주세요 🌟'); return; }
+  if(!rv.text||rv.text.trim().length<2){ alert('후기 내용을 조금만 더 적어주세요 🙂'); return; }
+  try{ const r=await fetch(PROXY+'/api/reviews',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({rating:rv.rating,text:rv.text,nick:rv.nick,danji:rv.danji})});
+    const d=await r.json(); if(!r.ok){ alert(d.error||'등록 실패'); return; }
+    alert('소중한 후기 감사해요! 💛'); A.rev={}; render(); loadReviews('revFull');
+  }catch(e){ alert('서버 연결을 확인해 주세요.'); } }
+
+render();
+</script>
+<script>if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("/sw.js").catch(function(){});});}</script>
+</body>
+</html>

@@ -1,0 +1,7 @@
+node_modules/
+.env
+leads.json
+visits.json
+sessions.json
+danji_templates.json
+jobs.json

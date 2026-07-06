@@ -1,0 +1,12 @@
+{
+  "name": "우리집 매트 견적",
+  "short_name": "매트견적",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#eef2f7",
+  "theme_color": "#2563eb",
+  "icons": [
+    { "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

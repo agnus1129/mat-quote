@@ -1,0 +1,16 @@
+{
+  "name": "danji-proxy",
+  "version": "1.0.0",
+  "description": "층간소음매트 견적앱 - 공공데이터 단지정보 중계 프록시",
+  "main": "server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node --env-file-if-exists=.env server.js",
+    "mock": "node --env-file-if-exists=.env server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "fast-xml-parser": "^4.4.1"
+  }
+}
