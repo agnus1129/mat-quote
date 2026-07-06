@@ -345,8 +345,8 @@ function render(){
       const dimInputs = A.showDim ? (quick+(sps.length?('<p class="hint" style="margin:6px 0">📏 더 정밀하게 — 공간별 가로·세로(벽~벽 안쪽). 비워두면 위 보정값/평형 기본값으로 계산돼요.</p>'
         + sps.map(sp=>'<div class="mrow"><div style="font-weight:600;margin-bottom:6px">'+sp.name+'</div><div class="r"><div><div class="lab">가로(mm)</div><input type="number" value="'+sp.w+'" oninput="dimU(\''+sp.name+'\',\'w\',this.value)"></div><div><div class="lab">세로(mm)</div><input type="number" value="'+sp.h+'" oninput="dimU(\''+sp.name+'\',\'h\',this.value)"></div></div></div>').join('')):'')) : '';
       const dimToggle = sps.length ? '<div class="link" onclick="A.showDim=!A.showDim;render()">'+(A.showDim?'▾ 실측 치수 접기':'✏️ 더 정확하게 — 실측 치수 직접 넣기 (선택)')+'</div>' : '';
-      s.innerHTML='<div class="ill">'+ILL.layout+'</div><h1>어디에 깔까요?</h1><p class="lead">공용부와 방만 고르면 평형 기본 치수로 <b>대략 견적</b>이 나와요. (실측은 선택)</p>'
-        +'<div class="sec">공용부 (하나 선택)</div>'+zones.map(z=>'<button class="opt'+(A.zone===z[0]?' sel':'')+'" onclick="A.zone=\''+z[0]+'\';render()">'+z[1]+'</button>').join('')
+      s.innerHTML='<div class="ill">'+ILL.layout+'</div><h1>어디에 깔까요?</h1><p class="lead">깔 곳과 방만 고르면 평형 기본 치수로 <b>대략 견적</b>이 나와요. (실측은 선택)</p>'
+        +'<div class="sec">거실·복도·주방 (하나 선택)</div>'+zones.map(z=>'<button class="opt'+(A.zone===z[0]?' sel':'')+'" onclick="A.zone=\''+z[0]+'\';render()">'+z[1]+'</button>').join('')
         +'<div class="sec">방 추가 (여러 개 선택 가능)</div><div>'+rooms.map(r=>'<span class="chip'+(A.rooms.indexOf(r)>=0?' sel':'')+'" onclick="toggleRoom(\''+r+'\')">'+r+'</span>').join('')+'</div>'
         +dimToggle+dimInputs
         +'<div class="link" onclick="A.manualMode=true;render()">또는 처음부터 직접 입력할게요(주택·빌라) →</div>'
@@ -412,8 +412,8 @@ function render(){
     s.innerHTML='<div class="ill">'+ILL.layout+'</div><h1>딱 두 가지만!</h1><p class="lead">평형과 범위만 고르면 <b>대략 견적</b>이 바로 나와요. 정확한 값은 언제든 실측으로 맞춰요 🙂</p>'
       +'<div class="sec">평형 (우리집과 가까운 것)</div>'
       +'<select onchange="A.quickKey=this.value" style="margin-bottom:12px">'+Object.keys(TPL).map(function(k){return '<option value="'+k+'"'+(A.quickKey===k?' selected':'')+'>'+TPL[k].label+'</option>';}).join('')+'</select>'
-      +'<div class="sec">공용부는 어디까지?</div>'
-      +[['living','거실만'],['living_hall','거실 + 복도'],['living_hall_kitchen','거실 + 복도 + 주방'],['none','공용부 없음 (방만 시공)']].map(function(o){return '<button class="opt'+(A.quickZone===o[0]?' sel':'')+'" onclick="A.quickZone=\''+o[0]+'\';render()">'+o[1]+'</button>';}).join('')
+      +'<div class="sec">어디에 깔까요?</div>'
+      +[['living','거실만'],['living_hall','거실 + 복도'],['living_hall_kitchen','거실 + 복도 + 주방'],['none','방만 시공']].map(function(o){return '<button class="opt'+(A.quickZone===o[0]?' sel':'')+'" onclick="A.quickZone=\''+o[0]+'\';render()">'+o[1]+'</button>';}).join('')
       +'<div class="sec">방은 몇 개까지?</div><div>'
       +[[0,'없음'],[1,'방 1개'],[2,'방 2개'],[3,'방 3개']].map(function(o){return '<span class="chip'+(A.quickRooms===o[0]?' sel':'')+'" onclick="A.quickRooms='+o[0]+';render()">'+o[1]+'</span>';}).join('')+'</div>'
       +'<p class="hint" style="margin-top:6px">조합을 바꿔가며 여러 경우의 견적을 바로 비교해보세요 🙂</p>'
@@ -563,7 +563,7 @@ function openConsult(){ hideTip(); $('menu').classList.remove('open'); go(8); }
 /* ===== 최소입력 빠른 견적 (#7) ===== */
 function runQuick(){ if(!A.quickKey)A.quickKey=Object.keys(TPL)[0];
   A.templateKey=A.quickKey; A.manualMode=false; A.extend=true; A.dim={}; A.livingW=0;
-  if(A.quickZone==='none'&&!(A.quickRooms>0)){ alert('공용부나 방을 하나 이상 골라주세요 🙂'); return; }
+  if(A.quickZone==='none'&&!(A.quickRooms>0)){ alert('깔 곳을 하나 이상 골라주세요 🙂'); return; }
   A.zone=A.quickZone; A.rooms=['방1','방2','방3'].slice(0,A.quickRooms||0);
   A.doors=0; A.doorsFlush=0; A.cuts=0; A.quickFrom=true; go(7); }
 
