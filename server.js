@@ -519,9 +519,10 @@ const SESS   = path.join(__dirname, 'sessions.json');
 function readJson(p){ try{ return JSON.parse(fs.readFileSync(p,'utf8')); }catch(e){ return []; } }
 function appendJson(p,rec){ const a=readJson(p); a.push(rec); try{ fs.writeFileSync(p, JSON.stringify(a,null,2)); }catch(e){} return a.length; }
 // 접속(앱 로드)마다 기록
+function clientIp(req){ return ((req.headers['x-forwarded-for']||'').split(',')[0].trim()) || (req.socket&&req.socket.remoteAddress) || ''; }
 app.post('/api/visit', (req,res) => {
   const b = req.body || {};
-  appendJson(VISITS, { ts:new Date().toISOString(), sessionId:b.sessionId||'', ua:req.headers['user-agent']||'', ref:b.ref||'' });
+  appendJson(VISITS, { ts:new Date().toISOString(), ip:clientIp(req), sessionId:b.sessionId||'', ua:req.headers['user-agent']||'', ref:b.ref||'' });
   res.json({ ok:true });
 });
 // 세션 종료/이탈 시 단계별 체류시간 + 입력정보 기록 (beacon)
@@ -554,6 +555,12 @@ app.post('/api/session', (req,res) => {
 app.get('/api/visits', requireAdmin, (_q,res) => res.json(readJson(VISITS)));
 app.get('/api/sessions', requireAdmin, (_q,res) => res.json(readJson(SESS)));
 // 단계별 평균·최대 체류시간 집계 (오래 머문 단계 = 개선 포인트)
+app.get('/api/uniques', requireAdmin, (_q,res) => {
+  const v=readJson(VISITS); const byDay={}; const all=new Set();
+  v.forEach(x=>{ if(!x.ip) return; all.add(x.ip); const d=(x.ts||'').slice(0,10); (byDay[d]=byDay[d]||new Set()).add(x.ip); });
+  res.json({ uniqueVisitors: all.size, totalHits: v.length,
+    byDay: Object.fromEntries(Object.entries(byDay).map(([d,st])=>[d,st.size])) });
+});
 app.get('/api/stats', requireAdmin, (_q,res) => {
   const sess = readJson(SESS); const agg = {};
   sess.forEach(s => (s.events||[]).forEach(e => {
