@@ -127,7 +127,7 @@ function notifyLead(rec){
   }
   // ③ 구글시트 백업 (Apps Script 웹앱 — 무료 영속 보관)
   if (process.env.SHEETS_WEBHOOK) {
-    fetch(process.env.SHEETS_WEBHOOK, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(rec) }).catch(()=>{});
+    fetch(process.env.SHEETS_WEBHOOK, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(Object.assign({type:'lead'},rec)) }).catch(()=>{});
   }
 }
 
@@ -519,10 +519,13 @@ const SESS   = path.join(__dirname, 'sessions.json');
 function readJson(p){ try{ return JSON.parse(fs.readFileSync(p,'utf8')); }catch(e){ return []; } }
 function appendJson(p,rec){ const a=readJson(p); a.push(rec); try{ fs.writeFileSync(p, JSON.stringify(a,null,2)); }catch(e){} return a.length; }
 // 접속(앱 로드)마다 기록
+function sheetsLog(o){ if(process.env.SHEETS_WEBHOOK){ try{ fetch(process.env.SHEETS_WEBHOOK,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(o)}).catch(()=>{});}catch(e){} } }
 function clientIp(req){ return ((req.headers['x-forwarded-for']||'').split(',')[0].trim()) || (req.socket&&req.socket.remoteAddress) || ''; }
 app.post('/api/visit', (req,res) => {
   const b = req.body || {};
-  appendJson(VISITS, { ts:new Date().toISOString(), ip:clientIp(req), sessionId:b.sessionId||'', ua:req.headers['user-agent']||'', ref:b.ref||'' });
+  const vrec={ ts:new Date().toISOString(), ip:clientIp(req), sessionId:b.sessionId||'', ua:req.headers['user-agent']||'', ref:b.ref||'' };
+  appendJson(VISITS, vrec);
+  sheetsLog(Object.assign({type:'visit'},vrec));
   res.json({ ok:true });
 });
 // 세션 종료/이탈 시 단계별 체류시간 + 입력정보 기록 (beacon)
@@ -538,6 +541,7 @@ app.post('/api/session', (req,res) => {
       const now = Date.now();
       if (!SESS_NOTIFIED[sid] || now - SESS_NOTIFIED[sid] > 10*60*1000) {
         SESS_NOTIFIED[sid] = now;
+        sheetsLog({type:'session', ts:new Date().toISOString(), sessionId:sid, danji:c.danji||'', tpl:c.tpl||'', zone:c.zone||'', rooms:c.rooms||0, mat:c.mat||'', area:c.area||0, cnt:c.cnt||0, total:c.total||0, lastStep:b.lastStep!=null?b.lastStep:''});
         const ZL = { living:'거실', living_hall:'거실+복도', living_hall_island:'거실+복도+아일랜드', living_hall_kitchen:'거실+복도+주방', none:'방만' };
         const won = n => Number(n||0).toLocaleString('ko-KR');
         tgNotify('📊 앱 이용 로그 (상담신청 아님)\n'
