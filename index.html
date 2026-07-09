@@ -289,8 +289,10 @@ function setBar(){const sd=Math.min(A.step,STEPS.length-1);const p=Math.min(100,
 const SID=Date.now().toString(36)+Math.random().toString(36).slice(2,7);
 let _enter=Date.now();
 function go(n){ A.events.push({step:A.step,dwellMs:Date.now()-_enter}); _enter=Date.now(); A.step=n; render(); }
-function sessionState(){ return {sessionId:SID, lastStep:A.step, events:A.events,
-  state:{templateKey:A.templateKey,zone:A.zone,rooms:A.rooms,manualMode:A.manualMode,extend:A.extend,company:A.company,doors:A.doors,doorsFlush:A.doorsFlush,pantry:A.pantry,cuts:A.cuts,danji:A.danji?A.danji.kaptName:null,agreeReq:A.agreeReq,agreeMkt:A.agreeMkt}}; }
+function sessionState(){ const o={sessionId:SID, lastStep:A.step, events:A.events,
+  state:{templateKey:A.templateKey,zone:A.zone,rooms:A.rooms,manualMode:A.manualMode,extend:A.extend,company:A.company,doors:A.doors,doorsFlush:A.doorsFlush,pantry:A.pantry,cuts:A.cuts,danji:A.danji?A.danji.kaptName:null,agreeReq:A.agreeReq,agreeMkt:A.agreeMkt}};
+  try{ const e=estimate(); if(e.area>0){ o.calc={danji:A.danji?A.danji.kaptName:null, tpl:(TPL[A.templateKey]||{}).label||'', zone:A.zone, rooms:(A.rooms||[]).length, mat:(MATS[A.company]||{}).L, area:+e.area.toFixed(1), cnt:e.midCount, total:e.grand}; } }catch(_){}
+  return o; }
 function sendSession(){ try{ const blob=new Blob([JSON.stringify(sessionState())],{type:'application/json'});
   if(navigator.sendBeacon) navigator.sendBeacon(PROXY+'/api/session',blob);
   else fetch(PROXY+'/api/session',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(sessionState()),keepalive:true}); }catch(e){} }

@@ -525,9 +525,30 @@ app.post('/api/visit', (req,res) => {
   res.json({ ok:true });
 });
 // 세션 종료/이탈 시 단계별 체류시간 + 입력정보 기록 (beacon)
+const SESS_NOTIFIED = {};
 app.post('/api/session', (req,res) => {
   let b = req.body; if (typeof b === 'string') { try{ b = JSON.parse(b); }catch(e){ b={}; } }
   appendJson(SESS, Object.assign({ ts:new Date().toISOString() }, b||{}));
+  // 견적까지 가본 이용자는 텔레그램으로 영구 기록 (무료서버 재시작 대비)
+  try{
+    const c = b && b.calc;
+    if (c && c.area > 0) {
+      const sid = b.sessionId || '';
+      const now = Date.now();
+      if (!SESS_NOTIFIED[sid] || now - SESS_NOTIFIED[sid] > 10*60*1000) {
+        SESS_NOTIFIED[sid] = now;
+        const ZL = { living:'거실', living_hall:'거실+복도', living_hall_island:'거실+복도+아일랜드', living_hall_kitchen:'거실+복도+주방', none:'방만' };
+        const won = n => Number(n||0).toLocaleString('ko-KR');
+        tgNotify('📊 앱 이용 로그 (상담신청 아님)\n'
+          + '단지: ' + (c.danji || '미검색') + '\n'
+          + '평형: ' + (c.tpl || '-') + '\n'
+          + '범위: ' + (ZL[c.zone] || c.zone || '-') + (c.rooms ? ' + 방' + c.rooms : '') + '\n'
+          + '매트: ' + (c.mat || '-') + ' · 면적 ' + c.area + '㎡ · 추천 ' + (c.cnt || '-') + '장\n'
+          + '예상액: ' + won(c.total) + '원\n'
+          + '마지막 단계: ' + (b.lastStep != null ? b.lastStep : '-') + ' / 7');
+      }
+    }
+  }catch(e){}
   res.json({ ok:true });
 });
 app.get('/api/visits', requireAdmin, (_q,res) => res.json(readJson(VISITS)));
